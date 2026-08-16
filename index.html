@@ -955,7 +955,8 @@ function renderSteps(){
   const names = ["Profile","Questions","Footprint","Plan","Peers","Share"];
   $("steps").innerHTML = names.map((n,i)=>{
     const k=i+1, cls = k===step?"on":k<step?"done":"";
-    return `<div class="step ${cls}"><b>${k}</b>${n}</div>`;
+    const back = k<step; // completed steps are clickable to jump back
+    return `<div class="step ${cls}"${back?` onclick="go(${k})" style="cursor:pointer"`:""}><b>${k}</b>${n}</div>`;
   }).join("");
 }
 
@@ -1031,6 +1032,13 @@ function renderQuestions(){
   if($("q_kwh")) $("q_kwh").placeholder = `≈ ${Math.round(est).toLocaleString()} typical`;
   if($("q_hours")) $("q_hours").placeholder = "50";
   if($("q_waste")) $("q_waste").placeholder = "" + Math.round(S.staff*9);
+
+  // refill any answers we already hold (from a loaded example or an earlier visit)
+  qs.forEach(q=>{
+    if(S.answers[q.id]!=null && $("q_"+q.id)) $("q_"+q.id).value = S.answers[q.id];
+    if(q.alt && S.answers[q.alt.id]!=null && $("q_"+q.alt.id)) $("q_"+q.alt.id).value = S.answers[q.alt.id];
+    if(S.unknown[q.id] && $("dk_"+q.id)){ const cb=$("dk_"+q.id).querySelector("input"); if(cb){ cb.checked=true; $("dk_"+q.id).classList.add("on"); } }
+  });
 }
 
 function estimateKwh(){
@@ -1040,6 +1048,7 @@ function estimateKwh(){
 
 function captureAnswers(){
   const qs = [...QUESTIONS_UNIVERSAL, ...(QUESTIONS_BY_TYPE[S.type]||[])];
+  if(!$("q_"+qs[0].id)) return;   // questions aren't on screen (e.g. an example was loaded) — keep existing answers
   S.answers={}; S.unknown={};
   qs.forEach(q=>{
     const el=$("q_"+q.id); if(!el) return;
