@@ -246,6 +246,32 @@ select option{background:#0a1417;color:var(--ink)}
 .note{border-top:1px solid var(--line);color:var(--ink3)}
 table td,table th{border-bottom:1px solid var(--line)}
 th{color:var(--ink3)} td{color:var(--ink2)} td.num{color:var(--ink)}
+
+/* ---- customer badge (step 6 + public shared view) ---- */
+.badge{position:relative;max-width:520px;margin:0 auto;text-align:center;background:linear-gradient(165deg,rgba(47,240,173,.14),rgba(6,14,16,.55));border:1px solid rgba(47,240,173,.4);border-radius:20px;padding:34px 28px 28px;box-shadow:0 0 0 1px rgba(47,240,173,.12),0 24px 60px rgba(0,0,0,.5),inset 0 0 70px rgba(47,240,173,.05)}
+.badge-seal{width:60px;height:60px;margin:0 auto 12px;border-radius:50%;display:grid;place-items:center;font-size:29px;background:radial-gradient(circle at 50% 35%,rgba(47,240,173,.38),rgba(6,14,16,.6));border:1px solid rgba(47,240,173,.45);box-shadow:var(--neon)}
+.badge-kicker{font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--green)}
+.badge-name{font-size:26px;font-weight:700;letter-spacing:-.02em;margin:8px 0 2px;color:var(--ink)}
+.badge-meta{color:var(--ink2);font-size:13.5px}
+.badge-line{color:var(--ink);font-size:15px;margin:12px 0 18px}
+.badge-impact{background:rgba(6,14,16,.4);border:1px solid var(--line);border-radius:14px;padding:16px;font-size:13.5px;color:var(--ink2)}
+.badge-eq{display:flex;gap:16px;justify-content:center;align-items:baseline;flex-wrap:wrap;margin-top:8px}
+.badge-eq span{font-size:19px;font-weight:700;color:var(--green)}
+.badge-eq small{flex-basis:100%;color:var(--ink3);font-size:12px;font-weight:400}
+.badge-moves{margin-top:16px}
+.badge-moves-h{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+.badge-moves ul{margin:0;padding:0;list-style:none;display:inline-block;text-align:left}
+.badge-moves li{font-size:13.5px;color:var(--ink);padding-left:22px;position:relative;margin:5px 0}
+.badge-moves li:before{content:"✓";position:absolute;left:0;color:var(--green);font-weight:700}
+.badge-foot{margin-top:20px;font-size:11.5px;color:var(--ink3);line-height:1.5}
+#public-badge{padding:34px 0}
+@media print{
+  body:before{display:none}
+  header,#steps,.note,.hint,.row,.sub,label,#bizName{display:none !important}
+  .card{box-shadow:none;border:none;background:none;backdrop-filter:none;padding:0}
+  .card h2{display:none}
+  .badge{box-shadow:0 0 0 2px #1f6b4a;page-break-inside:avoid}
+}
 </style>
 </head>
 <body>
@@ -257,6 +283,7 @@ th{color:var(--ink3)} td{color:var(--ink2)} td.num{color:var(--ink)}
 </header>
 
 <div class="steps" id="steps"></div>
+<div id="public-badge" class="hide"></div>
 
 <!-- ============ STEP 1: PROFILE ============ -->
 <section id="s1">
@@ -394,7 +421,29 @@ th{color:var(--ink3)} td{color:var(--ink2)} td.num{color:var(--ink)}
   <div class="row">
     <button class="btn ghost" onclick="go(4)">← Back to plan</button>
     <div class="spacer"></div>
-    <button class="btn ghost" onclick="location.reload()">Start over</button>
+    <button class="btn" onclick="go(6)">Create a badge for your customers →</button>
+  </div>
+</section>
+
+<!-- ============ STEP 6: CUSTOMER BADGE ============ -->
+<section id="s6" class="hide">
+  <div class="card">
+    <h2>Show your customers</h2>
+    <p class="sub">Turn your plan into a badge for your website, socials or shop window. Share the link and customers see a clean public version — which quietly invites the next business to measure theirs too.</p>
+    <label for="bizName">Your business name</label>
+    <input id="bizName" placeholder="e.g. Roti Sunrise Bakery" oninput="updateBadgeName(this.value)">
+    <div id="badge-preview" style="margin-top:24px"></div>
+    <div class="row">
+      <button class="btn" onclick="shareLink()">🔗 Copy shareable link</button>
+      <button class="btn ghost" onclick="printBadge()">Save / print</button>
+    </div>
+    <p class="hint" id="share-msg" style="margin-top:12px;min-height:18px"></p>
+    <p class="note">Honest by design: the badge says you're <b>starting</b> a measured plan — not that you've been audited or gone carbon-neutral. Claiming only what's true is what keeps it credible and greenwash-free.</p>
+  </div>
+  <div class="row">
+    <button class="btn ghost" onclick="go(5)">← Back</button>
+    <div class="spacer"></div>
+    <button class="btn ghost" onclick="location.href=location.pathname">Start over</button>
   </div>
 </section>
 
@@ -861,6 +910,7 @@ function equivChips(t){
   $("country").onchange = showGrid;
   showGrid();
   renderSteps();
+  maybeRenderPublicBadge();
 })();
 
 function showGrid(){
@@ -879,7 +929,7 @@ function toggleMotive(id, el){
 }
 
 function renderSteps(){
-  const names = ["Profile","Questions","Footprint","Plan","Peers"];
+  const names = ["Profile","Questions","Footprint","Plan","Peers","Share"];
   $("steps").innerHTML = names.map((n,i)=>{
     const k=i+1, cls = k===step?"on":k<step?"done":"";
     return `<div class="step ${cls}"><b>${k}</b>${n}</div>`;
@@ -891,8 +941,9 @@ function go(n){
   if(n===3) { captureAnswers(); compute(); renderFootprint(); }
   if(n===4) { renderPlan(); renderSupport(); }
   if(n===5) { renderPeers(); }
+  if(n===6) { renderShare(); }
   if(n===2) renderQuestions();
-  for(let i=1;i<=5;i++) $("s"+i).classList.toggle("hide", i!==n);
+  for(let i=1;i<=6;i++) $("s"+i).classList.toggle("hide", i!==n);
   step=n; renderSteps(); window.scrollTo({top:0,behavior:"smooth"});
 }
 
@@ -1165,8 +1216,11 @@ function renderPlan(){
   ];
 
   let n = 0;
+  S.planChosen = []; S.firstMoves = [];
   $("plan").innerHTML = horizons.map(H=>{
     const items = pool.filter(a=>a.h===H.h).sort((a,b)=>b.score-a.score).slice(0,H.n);
+    S.planChosen.push(...items);
+    if(H.h===30) S.firstMoves = items.slice(0,3).map(a=>a.t);
     const sum = combined(items);
     return `<div class="horizon">
       <div class="hlabel"><h4>${H.title}</h4><em>${H.em}</em>
@@ -1238,6 +1292,75 @@ function renderPeers(){
       <div class="res"><b>Result:</b> ${c.res}</div>
       <div class="meta" style="margin-left:0">${c.why.map(w=>`<span class="pill">${w}</span>`).join("")}</div>
     </div>`).join("");
+}
+
+/* ============================================================
+   STEP 6 — CUSTOMER BADGE (shareable with no backend: the data
+   is encoded into the share URL itself)
+   ============================================================ */
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function encodeBadge(d){ return btoa(encodeURIComponent(JSON.stringify(d))); }
+function decodeBadge(h){ try { return JSON.parse(decodeURIComponent(atob(h))); } catch(e){ return null; } }
+
+function badgeData(){
+  const R = S.result || {};
+  const total = combined(S.planChosen || []);
+  const pct = R.total ? Math.round(total / R.total * 100) : 0;
+  const e = equiv(total);
+  return {
+    name:(S.bizName || "").trim(),
+    type:TYPES[S.type].name, icon:TYPES[S.type].icon, country:S.country,
+    pct, trees:e.trees, cars:e.cars, moves:S.firstMoves || []
+  };
+}
+
+function badgeHTML(d, pub){
+  const moves = (d.moves || []).slice(0,3).map(m => `<li>${esc(m)}</li>`).join("");
+  const date = new Date().toLocaleDateString(undefined, {year:'numeric', month:'long'});
+  const trees = Number(d.trees)||0, cars = Number(d.cars)||0, pct = Number(d.pct)||0;
+  return `
+    <div class="badge">
+      <div class="badge-seal">🌱</div>
+      <div class="badge-kicker">Carbon commitment</div>
+      <div class="badge-name">${d.name ? esc(d.name) : esc(d.icon + " " + d.type)}</div>
+      <div class="badge-meta">${esc(d.type)} · ${esc(d.country)}</div>
+      <p class="badge-line">is taking real, measured steps to cut its carbon footprint.</p>
+      <div class="badge-impact">
+        <div>Their starting plan targets about <b>${pct}%</b> of their footprint — roughly:</div>
+        <div class="badge-eq"><span>🌳 ${trees.toLocaleString()} trees</span><span>🚗 ${cars.toLocaleString()} cars</span><small>worth of CO₂ kept out of the air, every year</small></div>
+      </div>
+      ${moves ? `<div class="badge-moves"><div class="badge-moves-h">Starting with</div><ul>${moves}</ul></div>` : ""}
+      <div class="badge-foot">Self-assessed with Carbon Coach · ${date}<br><span>A starting commitment based on a self-reported plan — not a certified audit.</span></div>
+      ${pub ? `<a class="btn" style="margin-top:20px;display:inline-block;text-decoration:none" href="${esc(location.pathname)}">Measure your business free →</a>` : ""}
+    </div>`;
+}
+
+function renderShare(){ $("badge-preview").innerHTML = badgeHTML(badgeData(), false); }
+function updateBadgeName(v){ S.bizName = v; renderShare(); }
+function shareLink(){
+  const url = location.origin + location.pathname + "#badge=" + encodeBadge(badgeData());
+  const msg = $("share-msg");
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(
+      () => { msg.style.color="var(--green)"; msg.textContent="✓ Link copied — paste it anywhere. Customers see a clean public badge."; },
+      () => { msg.style.color="var(--ink2)"; msg.textContent=url; }
+    );
+  } else { msg.style.color="var(--ink2)"; msg.textContent=url; }
+}
+function printBadge(){ window.print(); }
+
+/* If opened via a shared link, show only the public badge. */
+function maybeRenderPublicBadge(){
+  const m = (location.hash || "").match(/badge=([^&]+)/);
+  if(!m) return false;
+  const d = decodeBadge(m[1]);
+  if(!d) return false;
+  const steps = $("steps"); if(steps) steps.style.display="none";
+  for(let i=1;i<=6;i++){ const el=$("s"+i); if(el) el.classList.add("hide"); }
+  const host = $("public-badge");
+  host.classList.remove("hide");
+  host.innerHTML = badgeHTML(d, true);
+  return true;
 }
 
 function contribute(){
