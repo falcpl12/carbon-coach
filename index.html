@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carbon Coach — the consultant SMEs can't afford</title>
+<style>
+:root{
+  --ink:#12211c; --ink2:#4a5c55; --ink3:#7e908a;
+  --bg:#f6f5f1; --card:#fff; --line:#e2e0d9;
+  --green:#1f6b4a; --green2:#2f9268; --lime:#d9f0e2;
+  --amber:#b5761d; --amber-bg:#fdf1de;
+  --red:#a8442f;
+  --shadow:0 1px 2px rgba(18,33,28,.05),0 8px 24px rgba(18,33,28,.06);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.55 ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px 90px}
+
+/* header */
+header{padding:34px 0 22px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.brand{display:flex;align-items:center;gap:11px;font-weight:700;font-size:19px;letter-spacing:-.02em}
+.dot{width:22px;height:22px;border-radius:7px;background:var(--green);position:relative;flex:none}
+.dot:after{content:"";position:absolute;inset:6px;border-radius:3px;background:var(--lime)}
+.tag{font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--green);
+  background:var(--lime);padding:3px 8px;border-radius:5px}
+header p{margin:12px 0 0;color:var(--ink2);max-width:640px;font-size:15px}
+
+/* stepper */
+.steps{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:28px}
+.step{font-size:12.5px;font-weight:600;color:var(--ink3);background:var(--card);border:1px solid var(--line);
+  padding:6px 12px;border-radius:20px;display:flex;gap:7px;align-items:center}
+.step.on{color:#fff;background:var(--green);border-color:var(--green)}
+.step.done{color:var(--green);border-color:var(--green2);background:var(--lime)}
+.step b{font-weight:700;opacity:.65}
+
+/* cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:26px;box-shadow:var(--shadow);margin-bottom:18px}
+h2{margin:0 0 6px;font-size:22px;letter-spacing:-.02em}
+h3{margin:26px 0 10px;font-size:15px;letter-spacing:.01em}
+.sub{color:var(--ink2);font-size:14.5px;margin:0 0 20px}
+.hint{font-size:13px;color:var(--ink3);margin-top:5px;line-height:1.45}
+
+/* form */
+label{display:block;font-size:13px;font-weight:650;margin:0 0 6px;color:var(--ink)}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:9px;
+  font-size:14.5px;font-family:inherit;background:#fdfdfc;color:var(--ink)}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--green2);outline-offset:-1px;border-color:var(--green2)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:16px}
+.field{margin-bottom:2px}
+
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:#fdfdfc;border-radius:9px;padding:9px 13px;font-size:13.5px;
+  cursor:pointer;transition:.12s;font-family:inherit;color:var(--ink);text-align:left}
+.chip:hover{border-color:var(--green2)}
+.chip.on{background:var(--green);color:#fff;border-color:var(--green)}
+.chip small{display:block;font-size:11.5px;opacity:.7;margin-top:2px}
+
+/* buttons */
+.btn{background:var(--green);color:#fff;border:0;padding:12px 22px;border-radius:9px;font-size:14.5px;
+  font-weight:650;cursor:pointer;font-family:inherit}
+.btn:hover{background:#175139}
+.btn.ghost{background:transparent;color:var(--ink2);border:1px solid var(--line)}
+.btn.ghost:hover{background:#f0efea;color:var(--ink)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.row{display:flex;gap:10px;align-items:center;margin-top:26px;flex-wrap:wrap}
+.spacer{flex:1}
+
+/* question prompter */
+.q{border:1px solid var(--line);border-left:3px solid var(--green2);border-radius:0 10px 10px 0;
+  padding:15px 17px;margin-bottom:11px;background:#fdfdfc}
+.q .qt{font-weight:650;font-size:14.5px;margin-bottom:3px}
+.q .qw{font-size:12.8px;color:var(--ink3);margin-bottom:11px;line-height:1.5}
+.q .qw b{color:var(--amber);font-weight:650}
+.qin{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.qin input{max-width:150px}
+.qin .unit{font-size:13px;color:var(--ink3)}
+.dontknow{font-size:12.5px;color:var(--ink3);display:flex;align-items:center;gap:6px;cursor:pointer;
+  border:1px dashed var(--line);padding:6px 10px;border-radius:7px}
+.dontknow input{width:auto}
+.dontknow.on{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
+
+/* results */
+.bignum{font-size:44px;font-weight:700;letter-spacing:-.035em;line-height:1}
+.bignum span{font-size:17px;font-weight:600;color:var(--ink3);letter-spacing:0}
+.conf{display:inline-block;font-size:11.5px;font-weight:650;padding:3px 9px;border-radius:5px;
+  background:var(--amber-bg);color:var(--amber);margin-top:10px}
+.bars{margin-top:22px}
+.bar{margin-bottom:13px}
+.barhead{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:5px}
+.barhead b{font-weight:650}
+.barhead span{color:var(--ink3);font-variant-numeric:tabular-nums}
+.track{height:9px;background:#eceae4;border-radius:6px;overflow:hidden}
+.fill{height:100%;background:var(--green2);border-radius:6px}
+.fill.hot{background:var(--amber)}
+
+/* plan */
+.horizon{margin-bottom:26px}
+.hlabel{display:flex;align-items:baseline;gap:10px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.hlabel h4{margin:0;font-size:16px;letter-spacing:-.01em}
+.hlabel em{font-style:normal;font-size:12.5px;color:var(--ink3)}
+.act{border:1px solid var(--line);border-radius:11px;padding:16px 18px;margin-bottom:10px;background:#fdfdfc}
+.act .at{font-weight:650;font-size:15px;margin-bottom:4px;display:flex;gap:9px;align-items:flex-start}
+.act .at .n{flex:none;width:21px;height:21px;border-radius:6px;background:var(--lime);color:var(--green);
+  font-size:11.5px;display:grid;place-items:center;font-weight:700;margin-top:1px}
+.act .aw{font-size:13.3px;color:var(--ink2);margin:0 0 11px 30px}
+.baby{margin-left:30px;background:var(--lime);border-radius:8px;padding:11px 13px;font-size:13.3px}
+.baby b{color:var(--green);font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;display:block;margin-bottom:3px}
+.meta{display:flex;gap:7px;flex-wrap:wrap;margin:11px 0 0 30px}
+.pill{font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:5px;background:#f0efea;color:var(--ink2)}
+.pill.co2{background:var(--lime);color:var(--green)}
+.pill.money{background:#e8f0fb;color:#2b5c9c}
+.pill.free{background:#fdf1de;color:var(--amber)}
+
+/* peer */
+.peer{border:1px solid var(--line);border-radius:11px;padding:17px 19px;margin-bottom:11px;background:#fdfdfc}
+.peerhead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px}
+.peerhead b{font-size:14.5px}
+.peerhead .flag{font-size:12.5px;color:var(--ink3)}
+.match{font-size:11px;font-weight:700;color:var(--green);background:var(--lime);padding:3px 8px;border-radius:5px;white-space:nowrap}
+.peer p{margin:0 0 9px;font-size:13.4px;color:var(--ink2)}
+.peer .res{font-size:13.3px;background:#f0efea;padding:9px 12px;border-radius:8px}
+.peer .res b{color:var(--green)}
+.xref{background:var(--lime);border:1px solid var(--green2);border-radius:11px;padding:15px 18px;margin-bottom:16px;font-size:13.5px}
+.xref b{color:var(--green)}
+
+/* misc */
+.note{font-size:12.4px;color:var(--ink3);border-top:1px solid var(--line);padding-top:14px;margin-top:22px;line-height:1.5}
+.hide{display:none}
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:8px}
+td,th{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+th{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);font-weight:650}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+@media(max-width:640px){.card{padding:20px}.bignum{font-size:34px}}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============ FUTURISTIC RESKIN (overrides the variables + components above) ============ */
+:root{
+  --bg:#060c0f; --card:rgba(18,30,34,.72); --line:rgba(90,220,180,.16);
+  --ink:#ecfbf5; --ink2:#9fbdb4; --ink3:#6d8a82;
+  --green:#2ff0ad; --green2:#26d6c2; --lime:rgba(47,240,173,.13);
+  --amber:#ffc061; --amber-bg:rgba(255,192,97,.13); --red:#ff7a7a;
+  --glow:0 0 0 1px rgba(47,240,173,.10), 0 18px 50px rgba(0,0,0,.55);
+  --neon:0 0 22px rgba(47,240,173,.42);
+  --shadow:0 18px 50px rgba(0,0,0,.5);
+}
+*{ -webkit-font-smoothing:antialiased }
+body{
+  font-family:"Space Grotesk",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(900px 500px at 12% -8%, rgba(47,240,173,.10), transparent 60%),
+    radial-gradient(1000px 600px at 100% 0%, rgba(38,150,214,.10), transparent 55%),
+    linear-gradient(180deg,#060c0f,#05090b);
+  background-attachment:fixed;
+}
+body:before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.4;
+  background-image:linear-gradient(rgba(120,220,190,.05) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(120,220,190,.05) 1px,transparent 1px);
+  background-size:46px 46px;
+  -webkit-mask-image:radial-gradient(circle at 50% -5%,#000,transparent 72%);
+          mask-image:radial-gradient(circle at 50% -5%,#000,transparent 72%);
+}
+.wrap{position:relative;z-index:1}
+
+header{border-bottom:1px solid var(--line)}
+.brand{font-size:21px}
+.dot{background:linear-gradient(135deg,var(--green),var(--green2));box-shadow:var(--neon);border-radius:8px}
+.dot:after{background:#04110c}
+.tag{background:var(--lime);color:var(--green);border:1px solid rgba(47,240,173,.32);box-shadow:var(--neon)}
+header p{color:var(--ink2)}
+
+h2{background:linear-gradient(120deg,#ffffff,#b8f5e2 55%,var(--green));-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700}
+h3,h4{color:var(--ink)}
+.sub{color:var(--ink2)} .hint{color:var(--ink3)}
+
+.step{background:var(--card);border:1px solid var(--line);color:var(--ink3);backdrop-filter:blur(8px)}
+.step.on{background:linear-gradient(135deg,var(--green),var(--green2));color:#04110c;border-color:transparent;box-shadow:var(--neon)}
+.step.done{background:var(--lime);color:var(--green);border-color:rgba(47,240,173,.35)}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--glow);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+
+label{color:var(--ink)}
+input,select,textarea{background:rgba(6,14,16,.6);border:1px solid var(--line);color:var(--ink);border-radius:11px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green2);box-shadow:0 0 0 3px rgba(47,240,173,.18)}
+select option{background:#0a1417;color:var(--ink)}
+
+.chip{background:rgba(6,14,16,.5);border:1px solid var(--line);color:var(--ink);border-radius:11px}
+.chip:hover{border-color:var(--green2);box-shadow:0 0 0 3px rgba(47,240,173,.10)}
+.chip.on{background:linear-gradient(135deg,var(--green),var(--green2));color:#04110c;border-color:transparent;box-shadow:var(--neon)}
+.chip small{opacity:.75}
+
+.btn{background:linear-gradient(135deg,var(--green),var(--green2));color:#04110c;font-weight:700;border-radius:11px;box-shadow:var(--neon)}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--ink2);border:1px solid var(--line);box-shadow:none}
+.btn.ghost:hover{background:rgba(47,240,173,.08);color:var(--ink)}
+
+.q{background:rgba(6,14,16,.4);border:1px solid var(--line);border-left:2px solid var(--green2);border-radius:0 12px 12px 0}
+.q .qw b{color:var(--amber)}
+.dontknow{border-color:var(--line);color:var(--ink3)}
+.dontknow.on{border-color:var(--amber);color:var(--amber);background:var(--amber-bg)}
+
+.bignum{font-size:clamp(40px,9vw,62px);font-weight:700;background:linear-gradient(120deg,#ffffff,var(--green));-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:-.04em}
+.bignum span{color:var(--ink3);-webkit-text-fill-color:var(--ink3)}
+.conf{background:var(--amber-bg);color:var(--amber);border:1px solid rgba(255,192,97,.3)}
+.track{height:11px;background:rgba(255,255,255,.06);border-radius:8px}
+.fill{background:linear-gradient(90deg,var(--green2),var(--green));box-shadow:var(--neon);border-radius:8px;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.fill.hot{background:linear-gradient(90deg,#ff9a3c,var(--amber))}
+.barhead b{color:var(--ink)} .barhead span{color:var(--ink2)}
+
+/* relatable-equivalents cards (new) */
+.equiv{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px;margin:14px 0 4px}
+.eq{position:relative;overflow:hidden;background:linear-gradient(160deg,rgba(47,240,173,.10),rgba(6,14,16,.4));border:1px solid var(--line);border-radius:14px;padding:16px 14px 15px;text-align:center}
+.eq:before{content:"";position:absolute;inset:0;background:radial-gradient(150px 60px at 50% -25%,rgba(47,240,173,.22),transparent 70%);pointer-events:none}
+.eq-emoji{font-size:27px;display:block;filter:drop-shadow(0 0 10px rgba(47,240,173,.4))}
+.eq-n{position:relative;display:block;font-size:26px;font-weight:700;letter-spacing:-.02em;margin-top:5px;background:linear-gradient(120deg,#ffffff,var(--green));-webkit-background-clip:text;background-clip:text;color:transparent}
+.eq-l{position:relative;display:block;font-size:12px;color:var(--ink2);margin-top:3px;line-height:1.3}
+.equiv-cap{font-size:13.5px;color:var(--ink3);margin:20px 0 0}
+.eqline{color:var(--green);font-weight:600}
+
+.act{background:rgba(6,14,16,.4);border:1px solid var(--line);border-radius:13px}
+.act .at .n{background:linear-gradient(135deg,var(--green),var(--green2));color:#04110c;box-shadow:var(--neon);border-radius:7px}
+.act .aw{color:var(--ink2)}
+.baby{background:var(--lime);border:1px solid rgba(47,240,173,.22);border-radius:10px}
+.baby b{color:var(--green)}
+.pill{background:rgba(255,255,255,.05);color:var(--ink2);border:1px solid var(--line)}
+.pill.co2{background:var(--lime);color:var(--green);border-color:rgba(47,240,173,.3)}
+.pill.money{background:rgba(56,140,230,.16);color:#8cc0ff;border-color:rgba(56,140,230,.3)}
+.pill.free{background:var(--amber-bg);color:var(--amber);border-color:rgba(255,192,97,.3)}
+.hlabel{border-bottom:1px solid var(--line)}
+
+.peer{background:rgba(6,14,16,.4);border:1px solid var(--line);border-radius:13px}
+.peer .res{background:rgba(255,255,255,.04);border:1px solid var(--line)}
+.peer .res b{color:var(--green)}
+.match{background:var(--lime);color:var(--green);border:1px solid rgba(47,240,173,.3)}
+.xref{background:linear-gradient(160deg,rgba(47,240,173,.12),rgba(6,14,16,.3));border:1px solid rgba(47,240,173,.32);border-radius:13px;box-shadow:var(--glow)}
+.xref b{color:var(--green)}
+
+.note{border-top:1px solid var(--line);color:var(--ink3)}
+table td,table th{border-bottom:1px solid var(--line)}
+th{color:var(--ink3)} td{color:var(--ink2)} td.num{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="brand"><span class="dot"></span>Carbon Coach <span class="tag">Prototype</span></div>
+  <p>The questions a sustainability consultant would ask you — for free, in ten minutes. Then three things to do this month, and the business in another country that already did them.</p>
+</header>
+
+<div class="steps" id="steps"></div>
+
+<!-- ============ STEP 1: PROFILE ============ -->
+<section id="s1">
+  <div class="card">
+    <h2>Tell us what you actually do</h2>
+    <p class="sub">Five fields. No bills needed yet — we'll only ask for numbers you plausibly have.</p>
+    <div class="grid">
+      <div class="field">
+        <label for="btype">What kind of business?</label>
+        <select id="btype"></select>
+      </div>
+      <div class="field">
+        <label for="country">Where are you based?</label>
+        <select id="country"></select>
+        <div class="hint" id="gridnote"></div>
+      </div>
+      <div class="field">
+        <label for="staff">How many people work here?</label>
+        <input id="staff" type="number" min="1" value="12" placeholder="e.g. 12">
+      </div>
+      <div class="field">
+        <label for="sites">How many sites / premises?</label>
+        <input id="sites" type="number" min="1" value="1">
+      </div>
+      <div class="field">
+        <label for="rev">Rough annual revenue (USD)</label>
+        <select id="rev">
+          <option value="150000">Under $250k</option>
+          <option value="600000" selected>$250k – $1m</option>
+          <option value="3000000">$1m – $5m</option>
+          <option value="12000000">$5m – $20m</option>
+          <option value="35000000">Over $20m</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="own">Do you own or rent your premises?</label>
+        <select id="own">
+          <option value="rent">Rent — landlord controls the building</option>
+          <option value="own">Own it</option>
+        </select>
+        <div class="hint">Changes which actions are even possible for you.</div>
+      </div>
+    </div>
+
+    <h3>Why are you doing this? Pick what's actually driving it.</h3>
+    <div class="chips" id="motives"></div>
+    <div class="hint">This is the question most tools skip. It decides what we put at the top of your plan — a cost-driven plan and a compliance-driven plan look nothing alike.</div>
+
+    <div class="row">
+      <div class="spacer"></div>
+      <button class="btn" onclick="go(2)">Generate my questions →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STEP 2: QUESTION PROMPTER ============ -->
+<section id="s2" class="hide">
+  <div class="card">
+    <h2>The questions worth asking <span id="q-for" style="font-weight:400;color:var(--ink3)"></span></h2>
+    <p class="sub">A consultant charges $8–15k largely to know which questions matter for your kind of business. Here they are. Guess if you must — "I don't know" is a useful answer and we'll flag it.</p>
+    <div id="qlist"></div>
+    <div class="row">
+      <button class="btn ghost" onclick="go(1)">← Back</button>
+      <div class="spacer"></div>
+      <button class="btn" onclick="go(3)">See where my carbon sits →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STEP 3: FOOTPRINT ============ -->
+<section id="s3" class="hide">
+  <div class="card">
+    <h2>Your rough footprint</h2>
+    <p class="sub">Directional, not audit-grade. The point isn't the number — it's which bar is tallest.</p>
+    <div class="bignum" id="total"></div>
+    <div class="conf" id="conf"></div>
+    <p class="equiv-cap" id="equiv-cap"></p>
+    <div class="equiv" id="equiv"></div>
+    <div class="bars" id="bars"></div>
+    <div id="benchmark" class="note"></div>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0">What we did and didn't know</h3>
+    <table id="inputs-table"></table>
+    <div class="note" id="gaps"></div>
+  </div>
+  <div class="row">
+    <button class="btn ghost" onclick="go(2)">← Fix my answers</button>
+    <div class="spacer"></div>
+    <button class="btn" onclick="go(4)">Give me the baby steps →</button>
+  </div>
+</section>
+
+<!-- ============ STEP 4: PLAN ============ -->
+<section id="s4" class="hide">
+  <div class="card">
+    <h2>Your plan, in three sizes</h2>
+    <p class="sub" id="plan-sub"></p>
+    <div id="plan"></div>
+    <div class="note">Savings are order-of-magnitude estimates from your inputs, not guarantees. Do the 30-day items before you cost anything bigger — they're free and they tell you whether the estimates above are even close.</div>
+  </div>
+  <div class="card" id="support-card">
+    <h3 style="margin-top:0">💸 Money help where you are <span id="support-region" style="font-weight:400;color:var(--ink3)"></span></h3>
+    <p class="sub">Programmes that can help pay for the steps above. Names and eligibility change constantly, so treat these as leads to check — not guarantees.</p>
+    <div id="support"></div>
+  </div>
+  <div class="row">
+    <button class="btn ghost" onclick="go(3)">← Back</button>
+    <div class="spacer"></div>
+    <button class="btn" onclick="go(5)">Who's done this already? →</button>
+  </div>
+</section>
+
+<!-- ============ STEP 5: PEER LIBRARY ============ -->
+<section id="s5" class="hide">
+  <div class="card">
+    <h2>Businesses like yours, elsewhere</h2>
+    <p class="sub">Matched on what you do, how big you are, how dirty your grid is, and what's driving you — not on geography. A bakery in Bologna is a better teacher for a bakery in Penang than the office block next door.</p>
+    <p class="hint" style="margin:-14px 0 18px"><b>Illustrative examples.</b> The businesses and figures below are representative composites built to show how peer matching works — not verified case studies. Real, opted-in results will replace them as the library grows.</p>
+    <div class="xref" id="xref"></div>
+    <div id="peers"></div>
+    <h3>Add yours back to the library</h3>
+    <div class="card" style="box-shadow:none;margin:0;background:#fdfdfc">
+      <div class="grid">
+        <div class="field"><label>What did you try?</label><input id="c-what" placeholder="e.g. Consolidated oven batches"></div>
+        <div class="field"><label>What happened?</label><input id="c-res" placeholder="e.g. Gas bill down 18%"></div>
+      </div>
+      <div class="row" style="margin-top:14px">
+        <button class="btn" onclick="contribute()">Contribute →</button>
+        <span id="c-msg" style="font-size:13.5px;color:var(--green)"></span>
+      </div>
+      <div class="hint" style="margin-top:12px">This is the flywheel. Every plan generates a result; every result makes the next business's plan better. The library is the moat, not the model.</div>
+    </div>
+  </div>
+  <div class="row">
+    <button class="btn ghost" onclick="go(4)">← Back to plan</button>
+    <div class="spacer"></div>
+    <button class="btn ghost" onclick="location.reload()">Start over</button>
+  </div>
+</section>
+
+</div>
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+
+// Grid emission factors, kgCO2e per kWh (location-based, latest available)
+const GRIDS = {
+  "Australia":0.63,"Bangladesh":0.51,"Brazil":0.10,"Canada":0.12,"Chile":0.32,
+  "China":0.55,"Colombia":0.16,"Egypt":0.45,"France":0.06,"Germany":0.35,
+  "Ghana":0.31,"India":0.67,"Indonesia":0.75,"Italy":0.26,"Japan":0.45,
+  "Kenya":0.09,"Malaysia":0.74,"Mexico":0.42,"Morocco":0.61,"Netherlands":0.27,
+  "Nigeria":0.40,"Pakistan":0.41,"Peru":0.25,"Philippines":0.63,"Poland":0.62,
+  "Portugal":0.16,"Saudi Arabia":0.60,"Singapore":0.41,"South Africa":0.88,
+  "Spain":0.14,"Sweden":0.02,"Thailand":0.51,"Türkiye":0.44,"UAE":0.40,
+  "United Kingdom":0.18,"United States":0.37,"Vietnam":0.60,"Other / not listed":0.48
+};
+
+// Fuel factors kgCO2e per unit
+const F = { gasKwh:0.183, lpgL:1.56, dieselL:2.57, petrolL:2.07,
+            wasteKg:0.45, foodWasteKg:0.63, waterM3:0.50, dieselKm:0.21, petrolKm:0.17 };
+
+// Business types. share = typical split of total footprint (used to gross up from measured energy)
+// intensity = rough electricity use in kWh per employee per year
+const TYPES = {
+  bakery: { name:"Bakery / food production", icon:"🥖",
+    share:{ "Energy on site":0.42, "Ingredients & supply chain":0.34, "Waste & unsold stock":0.12, "Transport & delivery":0.09, "Water":0.03 },
+    intensity:9000 },
+  restaurant: { name:"Restaurant / café / bar", icon:"🍽",
+    share:{ "Energy on site":0.30, "Food purchased":0.42, "Waste & unsold stock":0.15, "Transport & delivery":0.08, "Water":0.05 },
+    intensity:10000 },
+  retail: { name:"Retail shop", icon:"🛍",
+    share:{ "Energy on site":0.34, "Goods you sell":0.46, "Transport & delivery":0.12, "Waste & unsold stock":0.08 },
+    intensity:6000 },
+  hotel: { name:"Hotel / guesthouse", icon:"🛏",
+    share:{ "Energy on site":0.54, "Food purchased":0.19, "Water":0.13, "Waste & unsold stock":0.09, "Transport & delivery":0.05 },
+    intensity:12000 },
+  manufacturing: { name:"Light manufacturing", icon:"⚙️",
+    share:{ "Energy on site":0.44, "Materials & inputs":0.35, "Transport & delivery":0.13, "Waste & unsold stock":0.08 },
+    intensity:11000 },
+  workshop: { name:"Workshop / repair / trade", icon:"🔧",
+    share:{ "Energy on site":0.30, "Materials & inputs":0.33, "Transport & delivery":0.31, "Waste & unsold stock":0.06 },
+    intensity:4500 },
+  office: { name:"Office / professional services", icon:"💼",
+    share:{ "Energy on site":0.33, "Business travel":0.30, "IT & purchased services":0.27, "Waste & unsold stock":0.10 },
+    intensity:3000 },
+  logistics: { name:"Logistics / delivery", icon:"🚚",
+    share:{ "Vehicle fuel":0.72, "Energy on site":0.16, "Packaging":0.12 },
+    intensity:3500 },
+  farm: { name:"Farm / agriculture", icon:"🌾",
+    share:{ "Fertiliser & livestock":0.44, "Fuel & machinery":0.29, "Energy on site":0.17, "Transport & delivery":0.10 },
+    intensity:5000 },
+  salon: { name:"Salon / personal care", icon:"✂️",
+    share:{ "Energy on site":0.53, "Products & consumables":0.30, "Water":0.11, "Waste & unsold stock":0.06 },
+    intensity:7000 },
+  warehouse: { name:"Warehouse / distribution", icon:"📦",
+    share:{ "Energy on site":0.48, "Transport & delivery":0.37, "Packaging":0.15 },
+    intensity:5500 },
+  school: { name:"School / training centre", icon:"🎓",
+    share:{ "Energy on site":0.50, "Business travel":0.24, "Food purchased":0.16, "Waste & unsold stock":0.10 },
+    intensity:3500 }
+};
+
+const MOTIVES = [
+  { id:"cost",       label:"Bills are eating me alive",       sub:"Cut cost first" },
+  { id:"customer",   label:"A big customer is asking",        sub:"Buyer / tender pressure" },
+  { id:"compliance", label:"Regulation or my bank wants data", sub:"CSRD, Scope 3, loan terms" },
+  { id:"impact",     label:"I just think it's the right thing", sub:"Largest real reduction" },
+  { id:"marketing",  label:"I want to say something credible", sub:"Without greenwashing" }
+];
+
+/* ---- QUESTION PROMPTER ----
+   universal + per-type. `why` is the consultant's reasoning, shown to the user. */
+const QUESTIONS_UNIVERSAL = [
+  { id:"kwh", t:"How many kWh of electricity did you use last year?",
+    why:"On the last page of any bill. If you only know the monthly cost, put that instead — we'll back into it.",
+    unit:"kWh/year", alt:{ id:"bill", label:"Or: average monthly electricity bill", unit:"USD/month" } },
+  { id:"gas", t:"Do you burn anything on site — gas, LPG, a diesel generator?",
+    why:"This is the part almost every free calculator gets wrong. On-site fuel is <b>Scope 1</b> — it's the emissions you directly control, and usually the cheapest to cut.",
+    unit:"kWh gas/year (or 0)" },
+  { id:"lpg", t:"LPG or bottled gas — how many litres a year?",
+    why:"Common in kitchens, ovens and dryers outside piped-gas regions. Rough is fine: bottles per month × size.",
+    unit:"litres/year (or 0)" },
+  { id:"km", t:"How many km do your own or leased vehicles do a year?",
+    why:"Only vehicles <b>you</b> own or lease. Staff commuting and courier companies count separately — don't double-count.",
+    unit:"km/year (or 0)" },
+  { id:"waste", t:"How much waste leaves the premises each week?",
+    why:"Estimate by bin: a full 240-litre wheelie bin of mixed commercial waste is roughly 25–30 kg.",
+    unit:"kg/week" },
+  { id:"hours", t:"How many hours a week are you actually open or producing?",
+    why:"The gap between hours-open and hours-powered is where the free savings live. Most SMEs run equipment 168 hours to serve 50.",
+    unit:"hours/week" },
+  { id:"asked", t:"Has any customer, bank, insurer or tender ever asked you for emissions data?",
+    why:"If yes, your plan needs a documentation trail, not just savings. If no, you have the luxury of starting with whatever saves money.",
+    unit:"1 = yes, 0 = no" }
+];
+
+const QUESTIONS_BY_TYPE = {
+  bakery:[
+    { id:"ovenhrs", t:"How many hours a day are ovens hot but not baking?", unit:"hours/day",
+      why:"The single biggest lever in a bakery. Pre-heat and idle time is pure loss — and it's free to fix." },
+    { id:"unsold", t:"What share of what you bake goes unsold at close?", unit:"%",
+      why:"Unsold bread carries its whole footprint — flour, milling, transport, baking — and then adds landfill methane on top. Typically 5–15%." }
+  ],
+  restaurant:[
+    { id:"foodwaste", t:"How many kg of food waste do you throw out a week?", unit:"kg/week",
+      why:"Food is usually a bigger share of a restaurant's footprint than the entire kitchen's energy. Nobody weighs it, so nobody manages it." },
+    { id:"hoodhrs", t:"How many hours a day does the extraction hood run at full power?", unit:"hours/day",
+      why:"Extraction is often the largest single electrical load, and it usually runs flat-out from open to close regardless of what's on the stove." }
+  ],
+  retail:[
+    { id:"offhours", t:"How many hours a week are lights or AC on while you're closed?", unit:"hours/week",
+      why:"Window displays, back-office, forgotten AC zones. Free to fix, visible on next month's bill." },
+    { id:"openfridge", t:"How many metres of open (undoored) refrigeration do you run?", unit:"metres",
+      why:"Open chillers use roughly 2× a doored equivalent. Retrofit doors are among the fastest paybacks in retail." }
+  ],
+  hotel:[
+    { id:"occ", t:"What's your average annual occupancy?", unit:"%",
+      why:"Energy per occupied room-night is the only number worth benchmarking. Total kWh tells you nothing about whether you're efficient." },
+    { id:"linen", t:"Do you change linen daily by default?", unit:"1 = yes, 0 = no",
+      why:"Laundry is heat plus water plus chemicals. An opt-in policy typically cuts loads 25–40% and guests rarely object." }
+  ],
+  manufacturing:[
+    { id:"compair", t:"Do you run compressed air, and has it been leak-tested in the last year?", unit:"1 = tested, 0 = not",
+      why:"Compressed air is the most expensive utility in most factories, and 20–30% of it typically leaks. An audible leak test costs an afternoon." },
+    { id:"scrap", t:"What's your scrap or reject rate?", unit:"%",
+      why:"Every rejected unit carries the full embodied carbon of its materials plus the energy to make it. Quality improvement is decarbonisation." }
+  ],
+  workshop:[
+    { id:"tripopt", t:"Do you plan job routes, or take them as they come in?", unit:"1 = planned, 0 = ad hoc",
+      why:"For a trade business, driving is usually the footprint. Route batching cuts fuel and adds billable hours in the same move." }
+  ],
+  office:[
+    { id:"flights", t:"How many return flights did the team take last year?", unit:"flights/year",
+      why:"For a service business, a handful of long-haul flights can outweigh the entire office's annual electricity." },
+    { id:"devices", t:"How many laptops/monitors did you replace last year?", unit:"units/year",
+      why:"A laptop's manufacture is ~300 kgCO2e — roughly four years of its own electricity. Extending life beats buying 'green' hardware." }
+  ],
+  logistics:[
+    { id:"loadfactor", t:"What's your average load factor — how full are vehicles?", unit:"%",
+      why:"Half-empty runs double your emissions per parcel. Consolidation beats every vehicle upgrade on cost per tonne saved." },
+    { id:"empty", t:"What share of your journeys are empty return legs?", unit:"%",
+      why:"Backhaul is the cheapest carbon in logistics. Often solved with a phone call to a neighbouring business, not a purchase." }
+  ],
+  farm:[
+    { id:"nfert", t:"How many tonnes of nitrogen fertiliser do you apply a year?", unit:"tonnes/year",
+      why:"Nitrogen fertiliser drives N₂O emissions — roughly 265× more potent than CO₂. Usually the largest single line on a farm." },
+    { id:"soiltest", t:"Have you soil-tested in the last 3 years?", unit:"1 = yes, 0 = no",
+      why:"Most farms over-apply because they're guessing. Testing typically cuts application 10–20% with no yield loss — it pays for itself." }
+  ],
+  salon:[
+    { id:"hotwater", t:"How many washes a day?", unit:"washes/day",
+      why:"Hot water is the dominant load in a salon. Low-flow heads at the basin are the highest-return €40 you will ever spend." }
+  ],
+  warehouse:[
+    { id:"lighthrs", t:"Are lights on in aisles nobody is standing in?", unit:"1 = yes, 0 = no",
+      why:"Motion-sensor zoning in low-traffic aisles typically cuts lighting energy 40–60%, and warehouse lighting is a big share of the bill." }
+  ],
+  school:[
+    { id:"holidays", t:"Does heating/cooling run during holidays and weekends?", unit:"1 = yes, 0 = no",
+      why:"Schools are empty roughly a third of the year. Timer schedules that match the term calendar are free and rarely set correctly." }
+  ]
+};
+
+/* ---- ACTION LIBRARY ----
+   horizon: 30 | 90 | 365. tags drive re-ranking by motive.
+   saves: fraction of the named hotspot, applied to that hotspot's tCO2e. */
+const ACTIONS = [
+  // ---- 30 day, free ----
+  { id:"a1", h:30, types:"*", hotspot:"Energy on site", saves:0.05, cost:"Free", effort:"1 hour",
+    t:"Read your own meter, twice",
+    w:"Take a meter reading at closing time and again before opening. Anything consumed overnight is being burnt by equipment nobody is using.",
+    baby:"Tonight and tomorrow morning, photograph the meter. Subtract. Multiply the difference by 7 and by your tariff — that's your annual overnight bill.",
+    tags:["cost","impact","compliance"] },
+  { id:"a2", h:30, types:"*", hotspot:"Energy on site", saves:0.07, cost:"Free", effort:"2 hours",
+    t:"Build a switch-off round",
+    w:"A written closing checklist, taped by the door, naming every item that should be off. Sounds trivial; it is consistently the highest-return action in SME energy audits.",
+    baby:"Walk the premises at closing tonight and list everything with a light on. That list is the checklist.",
+    tags:["cost","impact"] },
+  { id:"a3", h:30, types:"*", hotspot:"Energy on site", saves:0.06, cost:"Free", effort:"30 min",
+    t:"Reset every timer and thermostat",
+    w:"Heating and cooling schedules are usually set once at installation and never revisited. Widening the deadband by 2°C is invisible to people and material on the bill.",
+    baby:"Find every thermostat and timer. Write down the current setting before you change anything, so you can prove the difference.",
+    tags:["cost","impact"] },
+  { id:"a4", h:30, types:"bakery,restaurant,hotel,school", hotspot:"Waste & unsold stock", saves:0.15, cost:"Free", effort:"15 min/day",
+    t:"Weigh your waste for two weeks",
+    w:"You cannot cut what you don't count. Two weeks of a cheap scale by the bin gives you a real number and, usually, an uncomfortable surprise.",
+    baby:"Put a scale next to the bin tomorrow. Log kg per day on paper. Don't change anything yet — just measure.",
+    tags:["cost","impact","customer"] },
+  { id:"a5", h:30, types:"*", hotspot:"Energy on site", saves:0.03, cost:"Free", effort:"1 hour",
+    t:"Ask your utility for 12 months of data",
+    w:"Most utilities will send a full year of consumption on request, often with monthly or half-hourly detail. This is the dataset every consultant starts from.",
+    baby:"Send one email to your supplier: 'Please send 12 months of consumption data for account X.' Then stop.",
+    tags:["compliance","customer","cost"] },
+  { id:"a6", h:30, types:"logistics,workshop,farm", hotspot:"Vehicle fuel", saves:0.06, cost:"Free", effort:"1 hour",
+    t:"Check every tyre pressure",
+    w:"Under-inflated tyres cost 3–5% in fuel across a fleet. It is the least glamorous and most reliable saving in transport.",
+    baby:"Check all tyres this week and write the correct pressure on a sticker inside each cab door.",
+    tags:["cost","impact"] },
+  { id:"a7", h:30, types:"bakery,restaurant", hotspot:"Energy on site", saves:0.12, cost:"Free", effort:"2 hours",
+    t:"Consolidate your baking or cooking batches",
+    w:"A half-full oven uses nearly the same energy as a full one. Merging two half-batches into one full batch is a straight halving of that run's energy.",
+    baby:"For one week, note every time you run an oven less than two-thirds full. Then merge the two most frequent offenders.",
+    tags:["cost","impact"] },
+  { id:"a8", h:30, types:"office,school", hotspot:"Business travel", saves:0.10, cost:"Free", effort:"1 hour",
+    t:"Write a one-line travel test",
+    w:"Not a ban — a question. 'Would we still go if we paid for it personally?' applied before booking. Cuts marginal trips without a policy fight.",
+    baby:"Add one sentence to your travel approval: 'What would we lose if this were a video call?'",
+    tags:["cost","impact","compliance"] },
+
+  // ---- 90 day, small spend ----
+  { id:"b1", h:90, types:"*", hotspot:"Energy on site", saves:0.13, cost:"$150–600", effort:"1 day",
+    t:"Swap the lights that run longest",
+    w:"Not every light — only the ones on more than 8 hours a day. Those pay back in under a year; the rest can wait until they fail.",
+    baby:"Count the fittings that run all day. Price LED replacements for just those. Ignore the others entirely.",
+    tags:["cost","impact"] },
+  { id:"b2", h:90, types:"*", hotspot:"Energy on site", saves:0.08, cost:"$60–200", effort:"2 hours",
+    t:"Put timers on the obvious offenders",
+    w:"Water heaters, display lighting, signage, coffee machines. €15 plug timers on four devices routinely beat a €2,000 efficiency upgrade on payback.",
+    baby:"Buy four plug-in timers. Fit them to the four things you listed in your switch-off round.",
+    tags:["cost","impact"] },
+  { id:"b3", h:90, types:"retail,restaurant,bakery,hotel", hotspot:"Energy on site", saves:0.14, cost:"$200–900", effort:"1 day",
+    t:"Service and re-seal your refrigeration",
+    w:"Perished door seals and dust-caked condenser coils make a fridge run 20–30% harder. Refrigeration is often a third of a food business's electricity.",
+    baby:"Do the paper test: close a banknote in each fridge door. If it slides out, that seal is gone. Photograph every failure.",
+    tags:["cost","impact"] },
+  { id:"b4", h:90, types:"*", hotspot:"Waste & unsold stock", saves:0.22, cost:"$0–200", effort:"3 days",
+    t:"Separate one waste stream properly",
+    w:"One stream, done well, beats five done badly. Organics or cardboard, depending on what dominated your two-week weighing.",
+    baby:"Pick the single heaviest thing in your bin. Find one local buyer or collector for it. Just that one.",
+    tags:["cost","impact","customer"] },
+  { id:"b5", h:90, types:"bakery,restaurant,retail", hotspot:"Waste & unsold stock", saves:0.30, cost:"Free", effort:"1 week",
+    t:"Sell the surplus instead of binning it",
+    w:"Discount the last hour, or list on a surplus-food app. Converts a disposal cost into revenue and removes the landfill emissions entirely.",
+    baby:"Pick one product line. Mark it down 50% in the final hour for two weeks. Compare waste and takings.",
+    tags:["cost","impact","marketing"] },
+  { id:"b6", h:90, types:"*", hotspot:"Ingredients & supply chain", saves:0.06, cost:"Free", effort:"1 week",
+    t:"Send five suppliers one question",
+    w:"'Do you measure your emissions?' You're not auditing them. You're finding out which of your suppliers already has data — and building the Scope 3 trail buyers will eventually ask for.",
+    baby:"Email your five largest suppliers by spend. One question. Log who answers.",
+    tags:["compliance","customer","impact"] },
+  { id:"b7", h:90, types:"logistics,workshop,farm", hotspot:"Vehicle fuel", saves:0.12, cost:"$0–300", effort:"1 week",
+    t:"Batch your routes",
+    w:"Grouping jobs by geography instead of by call order cuts distance 10–20% and usually adds billable hours to the same day.",
+    baby:"Take last week's jobs and re-sort them by postcode on paper. Count the km you'd have saved.",
+    tags:["cost","impact"] },
+  { id:"b8", h:90, types:"manufacturing,warehouse", hotspot:"Energy on site", saves:0.11, cost:"$100–400", effort:"1 day",
+    t:"Hunt compressed air leaks",
+    w:"Run the compressor with production stopped and walk the lines listening. Typical factories leak 20–30% of what they compress.",
+    baby:"Come in on a quiet morning, turn everything else off, and walk the pipework with your ears. Tag every hiss.",
+    tags:["cost","impact"] },
+  { id:"b9", h:90, types:"hotel,salon", hotspot:"Water", saves:0.20, cost:"$50–250", effort:"Half day",
+    t:"Fit low-flow heads and aerators",
+    w:"Cuts hot water volume 30–50% with no perceptible change in pressure. Saves the water and the energy used to heat it.",
+    baby:"Time how long a basin tap takes to fill a 1-litre jug. Under 6 seconds means you're over-flowing and an aerator will pay back in weeks.",
+    tags:["cost","impact"] },
+  { id:"b10", h:90, types:"*", hotspot:"Energy on site", saves:0.04, cost:"Free", effort:"2 hours",
+    t:"Re-tender your energy contract",
+    w:"If you're rolled onto a default tariff you're likely overpaying. Many markets also let you buy a certified renewable tariff for little or no premium.",
+    baby:"Find your contract end date. Put a reminder 60 days before it. That single date is worth more than most efficiency projects.",
+    tags:["cost","marketing","compliance"] },
+
+  // ---- 365 day, real investment ----
+  { id:"c1", h:365, types:"*", hotspot:"Energy on site", saves:0.30, cost:"$3k–25k", effort:"3–6 months",
+    t:"Price rooftop solar properly",
+    w:"Only worth it once you've stopped wasting energy — otherwise you're paying to generate power you'd have saved for free. In a high-carbon grid, the carbon return is large.",
+    baby:"Get three quotes. Ask each for payback in years, not price. If nobody quotes under 8 years, park it and revisit next year.",
+    tags:["cost","impact","marketing"] },
+  { id:"c2", h:365, types:"bakery,restaurant,hotel,manufacturing", hotspot:"Energy on site", saves:0.25, cost:"$2k–20k", effort:"2–4 months",
+    t:"Replace the oldest heat-producing machine",
+    w:"One machine. The oldest oven, boiler, dryer or compressor. Efficiency gains over a 15-year-old unit are typically 25–40%.",
+    baby:"List your heat equipment by age. Get one quote for replacing the oldest — you don't have to buy it, you just need the number.",
+    tags:["cost","impact"] },
+  { id:"c3", h:365, types:"*", hotspot:"Ingredients & supply chain", saves:0.15, cost:"Varies", effort:"6 months",
+    t:"Switch your single highest-carbon input",
+    w:"Usually one material or ingredient dominates. Substituting or sourcing it closer moves more carbon than years of energy tinkering.",
+    baby:"Rank your purchases by spend. Take the top three and ask each supplier for a lower-carbon alternative. Compare on landed cost.",
+    tags:["impact","customer","compliance"] },
+  { id:"c4", h:365, types:"logistics,workshop", hotspot:"Vehicle fuel", saves:0.35, cost:"$8k–40k", effort:"6 months",
+    t:"Electrify the shortest-route vehicle first",
+    w:"The vehicle doing predictable short daily runs from a fixed base. Best economics, no range anxiety, and it teaches you the fleet before you commit.",
+    baby:"Identify the one vehicle that never exceeds 120 km a day. Get a lease quote for an electric equivalent.",
+    tags:["cost","impact","marketing"] },
+  { id:"c5", h:365, types:"*", hotspot:"Energy on site", saves:0.10, cost:"$500–3k", effort:"3 months",
+    t:"Insulate and seal the building",
+    w:"Roof insulation, door seals, draught-proofing. Unglamorous, permanent, and works in both hot and cold climates.",
+    baby:"On a hot or cold day, walk the perimeter with your hand out. Where you feel a draught, mark it with tape. That map is your quote.",
+    tags:["cost","impact"] },
+  { id:"c6", h:365, types:"*", hotspot:"Energy on site", saves:0.02, cost:"$0–500", effort:"2 months",
+    t:"Write down what you did — properly",
+    w:"A one-page record of baseline, actions and results. This is what a buyer, bank or tender actually wants, and it's what turns effort into commercial value.",
+    baby:"Open one document. Put your starting number at the top and today's date. Add a line each time you do something.",
+    tags:["compliance","customer","marketing"] },
+  { id:"c7", h:365, types:"farm", hotspot:"Fertiliser & livestock", saves:0.18, cost:"$200–2k", effort:"1 season",
+    t:"Soil-test and cut nitrogen to match",
+    w:"Most farms over-apply nitrogen because they're guessing. Testing typically supports a 10–20% cut with no yield penalty, and N₂O is 265× CO₂.",
+    baby:"Book a soil test for your largest field this season. One field. See what it says before changing anything else.",
+    tags:["cost","impact","compliance"] }
+];
+
+/* ---- PEER CASE LIBRARY ---- */
+const CASES = [
+  { biz:"Forno Aurora", country:"Italy", type:"bakery", staff:14, grid:"low",
+    did:"Mapped oven idle time for two weeks, then merged morning batches and moved proving to a single overnight cabinet instead of three.",
+    res:"Gas use down 22%, €4,100/yr saved, 6.8 tCO2e. Cost: nothing but two weeks of noting times.",
+    motive:["cost","impact"], seed:["a7","a1","b3"] },
+  { biz:"Roti Sunrise", country:"Malaysia", type:"bakery", staff:22, grid:"high",
+    did:"Took the Forno Aurora batching method off this platform, adapted it to a 24-hour operation, then added rooftop solar once idle load was down.",
+    res:"Electricity down 19% from scheduling alone; solar covered a further 31%. Total 41 tCO2e — the high-carbon grid made solar worth 3× the Italian equivalent.",
+    motive:["cost","impact"], seed:["a7","c1","a1"] },
+  { biz:"Café Ladera", country:"Colombia", type:"restaurant", staff:9, grid:"low",
+    did:"Weighed food waste for a fortnight, discovered 40% was prepped-but-unsold at close, and cut the last prep round.",
+    res:"Food cost down 7%, waste down 34%. The waste weighing took ten minutes a day.",
+    motive:["cost","impact"], seed:["a4","b5","b4"] },
+  { biz:"Hotel Wanjiru", country:"Kenya", type:"hotel", staff:31, grid:"low",
+    did:"Opt-in linen changes plus low-flow shower heads across 40 rooms. Guests were told why, on a card.",
+    res:"Laundry loads down 38%, water down 24%. Guest complaints: two in a year. Payback under four months.",
+    motive:["cost","marketing"], seed:["b9","a3"] },
+  { biz:"Nordwerk Präzision", country:"Germany", type:"manufacturing", staff:48, grid:"mid",
+    did:"Compressed air leak hunt on a Sunday morning, then fixed the 14 worst leaks.",
+    res:"Compressor runtime down 26%, €9,800/yr. A customer's supplier questionnaire was the reason they started at all.",
+    motive:["customer","cost"], seed:["b8","b6","c6"] },
+  { biz:"Zielony Sklep", country:"Poland", type:"retail", staff:7, grid:"high",
+    did:"Fitted doors to open chiller cabinets and put display lighting on timers.",
+    res:"Electricity down 28%. In a coal-heavy grid that was 19 tCO2e — the same action in France would have saved a quarter of that.",
+    motive:["cost","impact"], seed:["b3","b2","b1"] },
+  { biz:"Sanchez Reparaciones", country:"Mexico", type:"workshop", staff:5, grid:"mid",
+    did:"Re-sorted the job list by neighbourhood instead of by call order.",
+    res:"Fuel down 17% and two extra billable jobs a week. The carbon saving was a side effect of a scheduling fix.",
+    motive:["cost"], seed:["b7","a6"] },
+  { biz:"Verta Studio", country:"United Kingdom", type:"office", staff:19, grid:"low",
+    did:"Extended laptop replacement from 3 to 5 years and added one question to the travel approval form.",
+    res:"Flights down 40%, hardware spend down £14k. Embodied emissions avoided outweighed their entire office electricity.",
+    motive:["cost","compliance"], seed:["a8","c6","b6"] },
+  { biz:"Duta Logistik", country:"Indonesia", type:"logistics", staff:26, grid:"high",
+    did:"Called three neighbouring firms and filled empty return legs with their freight.",
+    res:"Empty running from 34% to 12%. New revenue line, and emissions per parcel down a third. Zero capital spent.",
+    motive:["cost","impact"], seed:["b7","c4"] },
+  { biz:"Sítio Boa Terra", country:"Brazil", type:"farm", staff:11, grid:"low",
+    did:"Soil-tested every field, found systematic over-application, cut nitrogen 18%.",
+    res:"No yield loss, R$31k saved on inputs, 44 tCO2e of N₂O avoided — bigger than everything else on the farm combined.",
+    motive:["cost","impact"], seed:["c7","a6"] },
+  { biz:"Nguyen Tailoring", country:"Vietnam", type:"manufacturing", staff:16, grid:"high",
+    did:"Cut fabric scrap from 14% to 8% with better nesting, and sold offcuts to a local upholsterer.",
+    res:"Material cost down 9%, waste to landfill down 61%. Won a European buyer partly on the documentation.",
+    motive:["customer","cost"], seed:["c3","b4","c6"] },
+  { biz:"Salão Marisol", country:"Portugal", type:"salon", staff:6, grid:"low",
+    did:"Aerators on every basin and a timer on the water heater.",
+    res:"€1,900/yr on a €140 spend. Payback: five weeks.",
+    motive:["cost"], seed:["b9","b2"] },
+  { biz:"Bodega del Sur", country:"Chile", type:"warehouse", staff:13, grid:"mid",
+    did:"Motion sensors in low-traffic aisles and a switch-off round at close.",
+    res:"Lighting energy down 47%. Installed by their own electrician in a day.",
+    motive:["cost","impact"], seed:["a2","b1","b2"] },
+  { biz:"Kumasi Fresh", country:"Ghana", type:"retail", staff:8, grid:"mid",
+    did:"Serviced refrigeration seals and coils after the paper test flagged six failed doors.",
+    res:"Electricity down 21% and spoilage down with it. Cost: one technician visit.",
+    motive:["cost","impact"], seed:["b3","a1"] }
+];
+
+/* ---- LOCAL SUPPORT: region-specific incentives, grants & rules ----
+   Short summaries of commonly-available programmes. Names and eligibility change
+   often — these are leads to verify, not guarantees. */
+const EU_MEMBERS = ["France","Germany","Italy","Netherlands","Poland","Portugal","Spain","Sweden"];
+const INCENTIVES = {
+  "Malaysia":[
+    { n:"Green Investment Tax Allowance (GITA)", d:"Tax allowance on qualifying green equipment listed on the MyHIJAU directory." },
+    { n:"Low Carbon Transition Facility", d:"Subsidised financing to help SMEs adopt low-carbon practices." }
+  ],
+  "Singapore":[
+    { n:"Energy Efficiency Grant (EEG)", d:"Co-funds energy-efficient equipment for food-services, retail and manufacturing SMEs." },
+    { n:"Enterprise Sustainability Programme", d:"Grant support to build sustainability capability and run projects." }
+  ],
+  "United Kingdom":[
+    { n:"SECR / ESOS", d:"Mandatory energy reporting and 4-yearly audits for larger firms — a compliance signal buyers increasingly ask about." },
+    { n:"Energy grants & Climate Change Agreements", d:"Heat-pump/efficiency grants, plus tax discounts for energy-intensive sectors." }
+  ],
+  "United States":[
+    { n:"Inflation Reduction Act credits", d:"30% investment tax credit for solar and the §179D deduction for efficient buildings." },
+    { n:"Utility rebates", d:"Most utilities rebate efficient lighting, HVAC and refrigeration — check your provider first." }
+  ],
+  "Australia":[
+    { n:"Small Business Energy Incentive", d:"Bonus tax deduction on eligible energy-efficient equipment." },
+    { n:"State certificate schemes", d:"VEU (VIC), ESS (NSW) and similar schemes subsidise upgrades via tradable certificates." }
+  ],
+  "India":[
+    { n:"SIDBI green financing", d:"Subsidised loans for MSME energy-efficiency and clean-energy projects." },
+    { n:"BEE ratings & PAT scheme", d:"Efficiency benchmarks; larger users can trade energy-saving certificates." }
+  ],
+  "Canada":[
+    { n:"Accelerated depreciation (Class 43.1/43.2)", d:"Fast tax write-off for clean-energy and efficiency equipment." },
+    { n:"Provincial & utility rebates", d:"Most provinces and utilities co-fund efficiency retrofits for small business." }
+  ],
+  _EU:[
+    { n:"CSRD reporting", d:"Sustainability reporting is cascading from large firms to their SME suppliers — expect buyers to ask for your data." },
+    { n:"National & EU efficiency grants", d:"Most member states offer grants or subsidised loans for SME efficiency and rooftop solar." }
+  ],
+  _default:[
+    { n:"National energy agency & your utility", d:"Almost every country runs SME efficiency grants or rebates — your utility is the fastest place to check." },
+    { n:"Green / sustainability-linked loans", d:"Ask your bank; many now offer cheaper finance for efficiency and solar projects." },
+    { n:"Your industry association", d:"Sector bodies often run scheme lists and group-buying deals SMEs can join." }
+  ]
+};
+function localSupport(){
+  const base = INCENTIVES[S.country] || [];
+  const eu = EU_MEMBERS.includes(S.country) ? INCENTIVES._EU : [];
+  const out = [...base, ...eu];
+  return out.length ? out : INCENTIVES._default;
+}
+function renderSupport(){
+  $("support-region").textContent = `— ${S.country}`;
+  $("support").innerHTML = localSupport().map(i =>
+    `<div class="act" style="margin-bottom:10px">
+       <div class="at" style="margin-bottom:6px">${i.n}</div>
+       <p class="aw" style="margin:0">${i.d}</p>
+     </div>`).join("");
+}
+
+/* ============================================================
+   STATE + HELPERS
+   ============================================================ */
+const S = { type:"bakery", country:"Italy", staff:12, sites:1, rev:600000, own:"rent",
+            motives:["cost"], answers:{}, unknown:{}, result:null };
+let step = 1;
+
+const $ = id => document.getElementById(id);
+const num = v => { const n = parseFloat(v); return isFinite(n) ? n : null; };
+const fmt = n => n >= 100 ? Math.round(n).toLocaleString() :
+                 n >= 10 ? n.toFixed(1) : n.toFixed(2);
+const gridBand = f => f < 0.25 ? "low" : f < 0.5 ? "mid" : "high";
+
+/* ---- relatable equivalents: turn tCO2e into things people can picture ---- */
+function equiv(t){
+  t = Math.max(0, t);
+  return {
+    trees:   Math.round(t*1000/21), // a mature tree soaks up ~21 kg CO2e a year
+    cars:    Math.round(t/4.6),     // an average car emits ~4.6 tCO2e a year
+    flights: Math.round(t/1.1)      // one long-haul return flight ~1.1 tCO2e
+  };
+}
+function equivChips(t){
+  const e = equiv(t);
+  return [
+    ["🌳", e.trees,   "trees working<br>for a full year"],
+    ["🚗", e.cars,    "cars taken off<br>the road for a year"],
+    ["✈️", e.flights, "long-haul return<br>flights"]
+  ].map(([em,n,l]) =>
+    `<div class="eq"><span class="eq-emoji">${em}</span><span class="eq-n">${n.toLocaleString()}</span><span class="eq-l">${l}</span></div>`
+  ).join("");
+}
+
+/* ---- init ---- */
+(function init(){
+  $("btype").innerHTML = Object.entries(TYPES)
+    .map(([k,v]) => `<option value="${k}">${v.icon}  ${v.name}</option>`).join("");
+  $("country").innerHTML = Object.keys(GRIDS).sort()
+    .map(c => `<option value="${c}"${c==="Italy"?" selected":""}>${c}</option>`).join("");
+  $("motives").innerHTML = MOTIVES.map(m =>
+    `<button class="chip${S.motives.includes(m.id)?" on":""}" data-m="${m.id}" onclick="toggleMotive('${m.id}',this)">${m.label}<small>${m.sub}</small></button>`).join("");
+  $("country").onchange = showGrid;
+  showGrid();
+  renderSteps();
+})();
+
+function showGrid(){
+  const c = $("country").value, f = GRIDS[c];
+  const band = gridBand(f);
+  const txt = band==="high" ? "high-carbon — electricity savings are worth a lot here"
+            : band==="mid"  ? "middling — worth cutting, worth switching"
+            : "already clean — your wins are more likely in fuel, waste or supply chain";
+  $("gridnote").innerHTML = `Grid: <b>${f.toFixed(2)} kgCO₂e/kWh</b> — ${txt}`;
+}
+
+function toggleMotive(id, el){
+  const i = S.motives.indexOf(id);
+  if(i>-1){ if(S.motives.length===1) return; S.motives.splice(i,1); el.classList.remove("on"); }
+  else { S.motives.push(id); el.classList.add("on"); }
+}
+
+function renderSteps(){
+  const names = ["Profile","Questions","Footprint","Plan","Peers"];
+  $("steps").innerHTML = names.map((n,i)=>{
+    const k=i+1, cls = k===step?"on":k<step?"done":"";
+    return `<div class="step ${cls}"><b>${k}</b>${n}</div>`;
+  }).join("");
+}
+
+function go(n){
+  if(n===2) captureProfile();   // always re-read step 1, in case they changed it
+  if(n===3) { captureAnswers(); compute(); renderFootprint(); }
+  if(n===4) { renderPlan(); renderSupport(); }
+  if(n===5) { renderPeers(); }
+  if(n===2) renderQuestions();
+  for(let i=1;i<=5;i++) $("s"+i).classList.toggle("hide", i!==n);
+  step=n; renderSteps(); window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function captureProfile(){
+  S.type=$("btype").value; S.country=$("country").value;
+  S.staff=Math.max(1,num($("staff").value)||1);
+  S.sites=Math.max(1,num($("sites").value)||1);
+  S.rev=num($("rev").value); S.own=$("own").value;
+}
+
+/* ============================================================
+   STEP 2 — QUESTION PROMPTER
+   ============================================================ */
+function renderQuestions(){
+  const t = TYPES[S.type];
+  $("q-for").textContent = `— for a ${t.name.toLowerCase()} in ${S.country}`;
+  const qs = [...QUESTIONS_UNIVERSAL, ...(QUESTIONS_BY_TYPE[S.type]||[])];
+  $("qlist").innerHTML = qs.map(q => {
+    const alt = q.alt ? `<span class="unit">or</span>
+        <input id="q_${q.alt.id}" type="number" placeholder="${q.alt.label.replace(/^Or: /,'')}" style="max-width:200px">
+        <span class="unit">${q.alt.unit}</span>` : "";
+    return `<div class="q">
+      <div class="qt">${q.t}</div>
+      <div class="qw">${q.why}</div>
+      <div class="qin">
+        <input id="q_${q.id}" type="number" placeholder="number">
+        <span class="unit">${q.unit}</span>
+        ${alt}
+        <label class="dontknow" id="dk_${q.id}">
+          <input type="checkbox" onchange="this.parentNode.classList.toggle('on',this.checked)"> I don't know
+        </label>
+      </div>
+    </div>`;
+  }).join("");
+
+  // prefill sensible defaults so the demo always produces something
+  const est = estimateKwh();
+  if($("q_kwh")) $("q_kwh").placeholder = `≈ ${Math.round(est).toLocaleString()} typical`;
+  if($("q_hours")) $("q_hours").placeholder = "50";
+  if($("q_waste")) $("q_waste").placeholder = "" + Math.round(S.staff*9);
+}
+
+function estimateKwh(){
+  // proxy: kWh per employee per year by sector, plus a fixed base load per extra site
+  return TYPES[S.type].intensity * S.staff + 8000 * (S.sites - 1);
+}
+
+function captureAnswers(){
+  const qs = [...QUESTIONS_UNIVERSAL, ...(QUESTIONS_BY_TYPE[S.type]||[])];
+  S.answers={}; S.unknown={};
+  qs.forEach(q=>{
+    const el=$("q_"+q.id); if(!el) return;
+    const dk=$("dk_"+q.id)?.querySelector("input")?.checked;
+    const v=num(el.value);
+    if(dk || v===null) S.unknown[q.id]=true; else S.answers[q.id]=v;
+    if(q.alt){ const a=num($("q_"+q.alt.id)?.value); if(a!==null) S.answers[q.alt.id]=a; }
+  });
+}
+
+/* ============================================================
+   STEP 3 — DIRECTIONAL FOOTPRINT
+   ============================================================ */
+function compute(){
+  const gf = GRIDS[S.country], t = TYPES[S.type];
+  const A = S.answers;
+  let known = 0, total = 0, assumed = [];
+
+  // --- electricity ---
+  let kwh = A.kwh;
+  if(kwh==null && A.bill!=null){ kwh = A.bill*12/0.16; assumed.push("electricity kWh inferred from your bill at ~$0.16/kWh"); }
+  if(kwh==null){ kwh = estimateKwh(); assumed.push("electricity estimated from headcount and business type"); }
+  else known++;
+  const eElec = kwh*gf/1000;
+
+  // --- on-site fuel ---
+  let eGas=0;
+  if(A.gas!=null){ eGas += A.gas*F.gasKwh/1000; known++; }
+  if(A.lpg!=null){ eGas += A.lpg*F.lpgL/1000; known++; }
+  if(A.gas==null && A.lpg==null && ["bakery","restaurant","hotel","manufacturing"].includes(S.type)){
+    eGas = eElec*0.55; assumed.push("on-site fuel assumed at ~55% of electricity emissions (typical for your sector)");
+  }
+
+  // --- vehicles ---
+  let eVeh=0;
+  if(A.km!=null){ eVeh = A.km*F.dieselKm/1000; known++; }
+  else if(["logistics","workshop","farm"].includes(S.type)){
+    eVeh = 18000*Math.max(1,Math.round(S.staff/4))*F.dieselKm/1000;
+    assumed.push("vehicle km assumed at 18,000 km per vehicle, one vehicle per 4 staff");
+  }
+
+  // --- waste ---
+  let eWaste=0;
+  if(A.waste!=null){ eWaste = A.waste*52*F.wasteKg/1000; known++; }
+  else { eWaste = S.staff*9*52*F.wasteKg/1000; assumed.push("waste assumed at 9 kg per person per week"); }
+
+  // energy-side measured total (scope 1+2 + waste)
+  const measured = eElec + eGas + eVeh + eWaste;
+
+  // gross up to full footprint using sector share of energy-type buckets
+  const energyShareKeys = ["Energy on site","Vehicle fuel","Fuel & machinery","Waste & unsold stock"];
+  let energyShare = 0;
+  Object.entries(t.share).forEach(([k,v])=>{ if(energyShareKeys.includes(k)) energyShare+=v; });
+  total = measured / Math.max(0.2, energyShare);
+
+  // distribute across hotspots
+  const hotspots = {};
+  Object.entries(t.share).forEach(([k,v])=> hotspots[k] = total*v);
+  // overwrite the ones we actually measured
+  if(hotspots["Energy on site"]!==undefined) hotspots["Energy on site"] = eElec+eGas;
+  if(hotspots["Vehicle fuel"]!==undefined) hotspots["Vehicle fuel"] = eVeh || hotspots["Vehicle fuel"];
+  if(hotspots["Fuel & machinery"]!==undefined) hotspots["Fuel & machinery"] = eVeh || hotspots["Fuel & machinery"];
+  if(hotspots["Waste & unsold stock"]!==undefined) hotspots["Waste & unsold stock"] = eWaste;
+
+  // nitrogen fertiliser: ~5.5 tCO2e per tonne of N (manufacture + field N2O)
+  if(A.nfert!=null && hotspots["Fertiliser & livestock"]!==undefined){
+    hotspots["Fertiliser & livestock"] = A.nfert*5.5; known++;
+  }
+  total = Object.values(hotspots).reduce((a,b)=>a+b,0);
+
+  const nQ = 5; // number of answers that actually drive the arithmetic
+  const conf = known>=4 ? "Moderate" : known>=2 ? "Low–moderate" : "Low";
+
+  S.result = { total, hotspots, kwh, eElec, eGas, eVeh, eWaste, gf, assumed, known, nQ, conf };
+}
+
+function renderFootprint(){
+  const R = S.result;
+  $("total").innerHTML = `${fmt(R.total)} <span>tCO₂e per year (rough)</span>`;
+  $("conf").textContent = `Confidence: ${R.conf} — ${R.known} of the ${R.nQ} numbers that drive this came from you; the rest are sector assumptions`;
+
+  const sorted = Object.entries(R.hotspots).sort((a,b)=>b[1]-a[1]);
+  const max = sorted[0][1];
+  $("bars").innerHTML = sorted.map(([k,v],i)=>`
+    <div class="bar">
+      <div class="barhead"><b>${k}</b><span>${fmt(v)} t · ${Math.round(v/R.total*100)}%</span></div>
+      <div class="track"><div class="fill${i===0?" hot":""}" style="width:${Math.max(2,v/max*100)}%"></div></div>
+    </div>`).join("");
+
+  $("equiv-cap").innerHTML = `A year of this weighs about the same as — so this is what it would take nature to cancel it out:`;
+  $("equiv").innerHTML = equivChips(R.total);
+
+  const perHead = R.total/S.staff;
+  const band = perHead<3 ? "at the low end" : perHead<10 ? "in the normal range" : "on the high side";
+  $("benchmark").innerHTML =
+    `That's <b>${perHead.toFixed(1)} tCO₂e per employee</b> — ${band}. Service SMEs typically land at 2–10 t/employee; manufacturers, farms and logistics run higher. Your biggest bar is <b>${sorted[0][0]}</b>, so that's where the plan starts.`;
+
+  $("inputs-table").innerHTML = `
+    <tr><th>Line</th><th style="text-align:right">tCO₂e/yr</th><th>Source</th></tr>
+    <tr><td>Electricity (${Math.round(R.kwh).toLocaleString()} kWh × ${R.gf} kg/kWh)</td><td class="num">${fmt(R.eElec)}</td><td>${S.answers.kwh?"Your figure":S.answers.bill?"From your bill":"Estimated"}</td></tr>
+    <tr><td>On-site fuel</td><td class="num">${fmt(R.eGas)}</td><td>${(S.answers.gas!=null||S.answers.lpg!=null)?"Your figure":"Estimated"}</td></tr>
+    <tr><td>Own vehicles</td><td class="num">${fmt(R.eVeh)}</td><td>${S.answers.km!=null?"Your figure":"Estimated"}</td></tr>
+    <tr><td>Waste</td><td class="num">${fmt(R.eWaste)}</td><td>${S.answers.waste!=null?"Your figure":"Estimated"}</td></tr>
+    <tr><td><i>Supply chain & everything else (modelled from sector profile)</i></td><td class="num">${fmt(Math.max(0,R.total-R.eElec-R.eGas-R.eVeh-R.eWaste))}</td><td>Sector model</td></tr>`;
+
+  $("gaps").innerHTML = R.assumed.length
+    ? `<b>We guessed at:</b> ${R.assumed.join("; ")}. Each one you replace with a real number tightens the answer — and the 30-day plan is designed to get you exactly those numbers.`
+    : `You answered everything with real numbers. This is about as good as a directional estimate gets without an on-site audit.`;
+}
+
+/* ============================================================
+   STEP 4 — BABY-STEP PLAN
+   ============================================================ */
+function scoreAction(a){
+  const R = S.result;
+  let s = 0;
+  // motive alignment
+  S.motives.forEach(m => { if(a.tags.includes(m)) s += 3; });
+  // hotspot size
+  const hs = R.hotspots[a.hotspot];
+  if(hs) s += (hs/R.total)*10;
+  // low effort bonus
+  if(a.cost==="Free") s += 2;
+  // renter can't do structural work
+  if(S.own==="rent" && ["c1","c5"].includes(a.id)) s -= 4;
+  return s;
+}
+
+function applicable(a){
+  if(a.types==="*") return true;
+  return a.types.split(",").includes(S.type);
+}
+
+/* Sectors name their hotspots differently. Map each action's hotspot onto the
+   nearest bucket that actually exists for this business type. */
+const HOTSPOT_ALIAS = {
+  "Energy on site":            ["Energy on site"],
+  "Vehicle fuel":              ["Vehicle fuel","Fuel & machinery","Transport & delivery"],
+  "Fuel & machinery":          ["Fuel & machinery","Vehicle fuel","Transport & delivery"],
+  "Business travel":           ["Business travel","Transport & delivery"],
+  "Water":                     ["Water","Energy on site"],
+  "Fertiliser & livestock":    ["Fertiliser & livestock","Materials & inputs"],
+  "Waste & unsold stock":      ["Waste & unsold stock","Packaging","Materials & inputs"],
+  "Ingredients & supply chain":["Ingredients & supply chain","Food purchased","Materials & inputs",
+                                "Goods you sell","Products & consumables","IT & purchased services",
+                                "Packaging","Fertiliser & livestock"]
+};
+function resolveHotspot(a){
+  const hs = S.result.hotspots;
+  for(const k of (HOTSPOT_ALIAS[a.hotspot] || [a.hotspot])) if(hs[k] != null) return k;
+  return null;
+}
+
+/* Diagnostic answers scale specific actions up or down — this is what makes the
+   plan feel personal rather than generic. Multiplier capped 0.5x–2.2x. */
+function modifier(a){
+  const A = S.answers; let m = 1, notes = [];
+  const bump = (cond, mult, note) => { if(cond){ m *= mult; notes.push(note); } };
+
+  // long opening hours vs equipment left running
+  if(A.hours != null && ["a1","a2","a3","b2"].includes(a.id)){
+    const idle = 168 - A.hours;
+    bump(idle > 110, 1.5, `you're closed ${Math.round(idle)} hours a week — big idle window`);
+    bump(idle < 40, 0.7, "you run near round-the-clock, so idle savings are smaller");
+  }
+  bump(A.ovenhrs != null && A.ovenhrs >= 2 && ["a7","a1","c2"].includes(a.id), 1 + Math.min(0.9, A.ovenhrs*0.22), `${A.ovenhrs}h/day of hot-but-idle oven time`);
+  bump(A.unsold != null && A.unsold >= 5 && ["b5","a4","b4"].includes(a.id), 1 + Math.min(1.0, (A.unsold-4)*0.08), `${A.unsold}% of production going unsold`);
+  bump(A.foodwaste != null && A.foodwaste > 40 && ["a4","b5","b4"].includes(a.id), 1.4, "heavy weekly food waste");
+  bump(A.hoodhrs != null && A.hoodhrs >= 8 && ["a2","a3","b2"].includes(a.id), 1.3, "extraction running most of the day");
+  bump(A.offhours != null && A.offhours > 30 && ["a2","b2","b1"].includes(a.id), 1.5, `${A.offhours} h/week of lights or AC while closed`);
+  bump(A.openfridge != null && A.openfridge > 0 && ["b3","b1"].includes(a.id), 1 + Math.min(0.8, A.openfridge*0.12), `${A.openfridge}m of open refrigeration`);
+  bump(A.occ != null && A.occ < 60 && ["a3","b2"].includes(a.id), 1.4, "low occupancy means a lot of empty conditioned space");
+  bump(A.linen === 1 && a.id === "b9", 1.6, "daily linen changes by default");
+  bump(A.compair === 0 && a.id === "b8", 1.7, "compressed air never leak-tested");
+  bump(A.scrap != null && A.scrap > 5 && a.id === "c3", 1 + Math.min(0.8, (A.scrap-4)*0.1), `${A.scrap}% scrap rate`);
+  bump(A.tripopt === 0 && ["b7","a6"].includes(a.id), 1.6, "routes taken ad hoc rather than planned");
+  bump(A.flights != null && A.flights > 6 && a.id === "a8", 1 + Math.min(1.0, (A.flights-6)*0.06), `${A.flights} flights last year`);
+  bump(A.devices != null && A.devices > S.staff*0.3 && a.id === "c3", 1.3, "fast hardware replacement cycle");
+  bump(A.loadfactor != null && A.loadfactor < 70 && ["b7","c4"].includes(a.id), 1.5, `${A.loadfactor}% average load factor`);
+  bump(A.empty != null && A.empty > 20 && a.id === "b7", 1 + Math.min(0.9, (A.empty-15)*0.04), `${A.empty}% empty return legs`);
+  bump(A.soiltest === 0 && a.id === "c7", 1.6, "no recent soil test — likely over-applying");
+  bump(A.lighthrs === 1 && ["b1","b2","a2"].includes(a.id), 1.5, "lights on in empty aisles");
+  bump(A.holidays === 1 && ["a3","b2"].includes(a.id), 1.6, "HVAC running through holidays");
+  bump(A.asked === 1 && ["c6","b6","a5"].includes(a.id), 1.0, "");
+
+  return { m: Math.max(0.5, Math.min(2.2, m)), notes: notes.filter(Boolean) };
+}
+
+function saved(a){
+  const key = resolveHotspot(a);
+  if(!key) return 0;
+  return S.result.hotspots[key] * a.saves * modifier(a).m;
+}
+
+/* Two actions on the same hotspot don't simply add — the second one is working on
+   what the first already removed. Combine multiplicatively per hotspot. */
+function combined(items){
+  const byHot = {};
+  items.forEach(a=>{
+    const k = resolveHotspot(a); if(!k) return;
+    const frac = Math.min(0.85, a.saves * modifier(a).m);
+    byHot[k] = 1 - (1 - (byHot[k]||0)) * (1 - frac);
+  });
+  return Object.entries(byHot)
+    .reduce((sum,[k,f]) => sum + S.result.hotspots[k] * Math.min(f,0.6), 0);
+}
+
+function renderPlan(){
+  const R = S.result;
+  // drop anything that resolves to nothing for this sector — never show a 0.0 t action
+  const pool = ACTIONS.filter(applicable)
+    .map(a=>({...a, score:scoreAction(a), t_saved:saved(a)}))
+    .filter(a=>a.t_saved > 0.001);
+  const motiveLabel = S.motives.map(m=>MOTIVES.find(x=>x.id===m).label.toLowerCase()).join(" and ");
+  $("plan-sub").innerHTML = `Ordered for a business whose driver is <b>${motiveLabel}</b>, with <b>${Object.entries(R.hotspots).sort((a,b)=>b[1]-a[1])[0][0]}</b> as the dominant hotspot. Change your driver on step 1 and this list reshuffles.`;
+
+  const horizons = [
+    {h:30, title:"Next 30 days", em:"Free. No purchases. This is where you find out what's actually true.", n:3},
+    {h:90, title:"Next 90 days", em:"Small spend, fast payback. Only start these once the 30-day items are done.", n:4},
+    {h:365,title:"This year", em:"Real investment. Only worth pricing after you've stopped wasting what you already buy.", n:3}
+  ];
+
+  let n = 0;
+  $("plan").innerHTML = horizons.map(H=>{
+    const items = pool.filter(a=>a.h===H.h).sort((a,b)=>b.score-a.score).slice(0,H.n);
+    const sum = combined(items);
+    return `<div class="horizon">
+      <div class="hlabel"><h4>${H.title}</h4><em>${H.em}</em>
+        <span class="spacer"></span></div>
+      <div style="font-size:13px;color:var(--ink3);margin:-6px 0 6px">Together, roughly <b style="color:var(--green)">${fmt(sum)} tCO₂e/yr</b> — about ${Math.round(sum/R.total*100)}% of your footprint. Less than the sum of the items below, because several of them are cutting into the same pot.</div>
+      <div style="font-size:13.5px;color:var(--ink2);margin:0 0 14px">That's like planting <span class="eqline">🌳 ${equiv(sum).trees.toLocaleString()} trees</span> or taking <span class="eqline">🚗 ${equiv(sum).cars.toLocaleString()} cars</span> off the road — every year.</div>
+      ${items.map(a=>{
+        n++;
+        const mod = modifier(a);
+        const flag = mod.notes.length
+          ? `<div class="aw" style="color:var(--amber);margin-bottom:0"><b>Ranked up for you because:</b> ${mod.notes.join("; ")}.</div>` : "";
+        return `<div class="act">
+          <div class="at"><span class="n">${n}</span>${a.t}</div>
+          <p class="aw">${a.w}</p>
+          ${flag}
+          <div class="baby"><b>Start here, today</b>${a.baby}</div>
+          <div class="meta">
+            <span class="pill co2">≈ ${fmt(a.t_saved)} tCO₂e/yr</span>
+            <span class="pill ${a.cost==="Free"?"free":"money"}">${a.cost}</span>
+            <span class="pill">${a.effort}</span>
+            <span class="pill">${resolveHotspot(a) || a.hotspot}</span>
+          </div>
+        </div>`;
+      }).join("")}
+    </div>`;
+  }).join("");
+}
+
+/* ============================================================
+   STEP 5 — PEER MATCHING
+   ============================================================ */
+// Loose sector families, so a salon can still learn from an office when no salon exists.
+const FAMILY = {
+  bakery:"food", restaurant:"food", hotel:"food",
+  retail:"goods", warehouse:"goods", logistics:"goods",
+  manufacturing:"making", workshop:"making", farm:"making",
+  office:"service", school:"service", salon:"service"
+};
+
+function matchScore(c){
+  let s=0, why=[];
+  if(c.type===S.type){ s+=6; why.push("same trade"); }
+  else if(FAMILY[c.type]===FAMILY[S.type]){ s+=1.5; why.push("adjacent trade"); }
+  if(c.grid===gridBand(GRIDS[S.country])){ s+=3; why.push(`similar grid carbon intensity (${c.grid})`); }
+  const ratio = c.staff/S.staff;
+  if(ratio>0.4 && ratio<2.5){ s+=2; why.push("similar size"); }
+  const shared = c.motive.filter(m=>S.motives.includes(m));
+  if(shared.length){ s+=2*shared.length; why.push("same reason for starting"); }
+  if(c.country===S.country){ s+=0.5; why.push("same country"); }
+  return {s:Math.max(s,0.5), why};
+}
+
+function renderPeers(){
+  const scored = CASES.map(c=>({...c, ...matchScore(c)}))
+                      .sort((a,b)=>b.s-a.s);
+  const top = scored.slice(0,4);
+  const maxS = top[0].s;
+
+  const foreign = top.find(c=>c.country!==S.country) || top[0];
+  $("xref").innerHTML = `<b>Cross-border match:</b> ${foreign.biz} (${foreign.country}) is a ${TYPES[foreign.type].name.toLowerCase()} of ${foreign.staff} people in a ${foreign.grid}-carbon grid — ${foreign.why.join(", ")}. Their playbook transfers to you with almost no translation. That's the whole idea: the knowledge exists, it's just trapped inside businesses that never meet.`;
+
+  $("peers").innerHTML = top.map(c=>`
+    <div class="peer">
+      <div class="peerhead">
+        <div><b>${c.biz}</b> <span class="flag">· ${TYPES[c.type].name} · ${c.country} · ${c.staff} staff</span></div>
+        <span class="match">${Math.round(c.s/maxS*100)}% match</span>
+      </div>
+      <p><b>What they did:</b> ${c.did}</p>
+      <div class="res"><b>Result:</b> ${c.res}</div>
+      <div class="meta" style="margin-left:0">${c.why.map(w=>`<span class="pill">${w}</span>`).join("")}</div>
+    </div>`).join("");
+}
+
+function contribute(){
+  const w=$("c-what").value.trim(), r=$("c-res").value.trim();
+  if(!w||!r){ $("c-msg").textContent="Fill both fields."; $("c-msg").style.color="var(--red)"; return; }
+  CASES.unshift({ biz:"Your business", country:S.country, type:S.type, staff:S.staff,
+    grid:gridBand(GRIDS[S.country]), did:w, res:r, motive:S.motives, seed:[] });
+  $("c-msg").style.color="var(--green)";
+  $("c-msg").textContent="Added — you're now a reference case for the next business like yours.";
+  $("c-what").value=""; $("c-res").value="";
+  renderPeers();
+}
+</script>
+</body>
+</html>
