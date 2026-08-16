@@ -286,9 +286,13 @@ th{color:var(--ink3)} td{color:var(--ink2)} td.num{color:var(--ink)}
 <header>
   <div class="brand"><span class="dot"></span>Carbon Coach <span class="tag">Prototype</span></div>
   <p>Sustainability consultants cost a small business $8,000–15,000. Carbon Coach asks the same questions for free, in ten minutes — then hands you three things to do this month and a business abroad that already did them.</p>
-  <div class="row" style="margin-top:14px">
-    <button class="btn" onclick="loadExample()">▶  See a live example</button>
-    <span class="hint" style="align-self:center">Watch a Malaysian bakery get its full plan in one click</span>
+  <div style="margin-top:16px">
+    <div class="hint" style="margin-bottom:8px">▶ See it instantly — one click, a real plan for a very different business:</div>
+    <div class="row" style="margin-top:0;gap:10px">
+      <button class="btn" onclick="loadExample('bakery')">🥖 Bakery · Malaysia</button>
+      <button class="btn ghost" onclick="loadExample('hotel')">🛏 Hotel · Kenya</button>
+      <button class="btn ghost" onclick="loadExample('logistics')">🚚 Logistics · Indonesia</button>
+    </div>
   </div>
 </header>
 
@@ -852,6 +856,14 @@ const INCENTIVES = {
     { n:"Accelerated depreciation (Class 43.1/43.2)", d:"Fast tax write-off for clean-energy and efficiency equipment." },
     { n:"Provincial & utility rebates", d:"Most provinces and utilities co-fund efficiency retrofits for small business." }
   ],
+  "Kenya":[
+    { n:"Solar & energy-equipment tax relief", d:"Qualifying solar and energy-efficiency equipment is zero-rated for VAT and import duty." },
+    { n:"KAM energy-efficiency programmes", d:"The Kenya Association of Manufacturers' energy centre runs audits and support SMEs can join." }
+  ],
+  "Indonesia":[
+    { n:"Green financing (OJK taxonomy)", d:"Banks offer preferential green loans for efficiency and renewables under the OJK green taxonomy." },
+    { n:"Renewable-energy tax facilities", d:"Tax allowances and import-duty relief are available for qualifying efficiency and renewable investments." }
+  ],
   _EU:[
     { n:"CSRD reporting", d:"Sustainability reporting is cascading from large firms to their SME suppliers — expect buyers to ask for your data." },
     { n:"National & EU efficiency grants", d:"Most member states offer grants or subsidised loans for SME efficiency and rooftop solar." }
@@ -958,15 +970,25 @@ function go(n){
   step=n; renderSteps(); window.scrollTo({top:0,behavior:"smooth"});
 }
 
-/* One-click demo: pre-fill a realistic business and jump to the footprint,
-   so a live demo lands on the payoff without any typing. */
-function loadExample(){
-  S.type="bakery"; S.country="Malaysia"; S.staff=22; S.sites=1; S.rev=600000; S.own="rent"; S.motives=["cost"];
-  if($("btype")) $("btype").value="bakery";
-  if($("country")){ $("country").value="Malaysia"; showGrid(); }
-  if($("staff")) $("staff").value=22;
-  S.answers = { kwh:198000, gas:150000, lpg:0, waste:210, hours:60, ovenhrs:3, unsold:9 };
-  S.unknown = {};
+/* One-click demos: pre-filled, realistic businesses across sectors/countries so a
+   live demo lands on the payoff instantly and shows the tool adapting. */
+const EXAMPLES = {
+  bakery:    { type:"bakery",    country:"Malaysia",  staff:22, motives:["cost"],
+    answers:{ kwh:198000, gas:150000, lpg:0, waste:210, hours:60, ovenhrs:3, unsold:9 } },
+  hotel:     { type:"hotel",     country:"Kenya",     staff:31, motives:["cost","marketing"],
+    answers:{ kwh:372000, gas:200000, lpg:0, waste:290, hours:168, occ:55, linen:1 } },
+  logistics: { type:"logistics", country:"Indonesia", staff:26, motives:["cost","impact"],
+    answers:{ kwh:91000, gas:0, km:450000, waste:120, loadfactor:60, empty:30 } }
+};
+function loadExample(key){
+  const e = EXAMPLES[key] || EXAMPLES.bakery;
+  S.type=e.type; S.country=e.country; S.staff=e.staff; S.sites=1; S.rev=600000; S.own="rent";
+  S.motives=e.motives.slice();
+  if($("btype"))   $("btype").value=e.type;
+  if($("country")){ $("country").value=e.country; showGrid(); }
+  if($("staff"))   $("staff").value=e.staff;
+  document.querySelectorAll('#motives .chip').forEach(c => c.classList.toggle('on', S.motives.includes(c.dataset.m)));
+  S.answers = Object.assign({}, e.answers); S.unknown = {};
   compute(); renderFootprint();
   for(let i=1;i<=6;i++) $("s"+i).classList.toggle("hide", i!==3);
   step=3; renderSteps(); window.scrollTo({top:0,behavior:"smooth"});
