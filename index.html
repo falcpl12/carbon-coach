@@ -446,7 +446,7 @@ th{color:var(--ink3)} td{color:var(--ink2)} td.num{color:var(--ink)}
         <button class="btn" onclick="contribute()">Contribute →</button>
         <span id="c-msg" style="font-size:13.5px;color:var(--green)"></span>
       </div>
-      <div class="hint" style="margin-top:12px">This is the flywheel. Every plan generates a result; every result makes the next business's plan better. The library is the moat, not the model.</div>
+      <div class="hint" style="margin-top:12px">This becomes the flywheel once it's shared: every result makes the next business's plan better. Right now, anything you add here is saved on <b>this device only</b> — a library shared across businesses is the next milestone, not live yet.</div>
     </div>
   </div>
   <div class="row">
@@ -474,7 +474,7 @@ th{color:var(--ink3)} td{color:var(--ink2)} td.num{color:var(--ink)}
   <div class="row">
     <button class="btn ghost" onclick="go(5)">← Back</button>
     <div class="spacer"></div>
-    <button class="btn ghost" onclick="location.href=location.pathname">Start over</button>
+    <button class="btn ghost" onclick="startOver()">Start over</button>
   </div>
 </section>
 
@@ -911,6 +911,81 @@ function renderSupport(){
 const S = { type:"bakery", country:"Italy", staff:12, sites:1, rev:600000, own:"rent",
             motives:["cost"], answers:{}, unknown:{}, result:null };
 let step = 1;
+const SAVE_KEY = "carboncoach_state_v1";
+const CASES_KEY = "carboncoach_contributed_v1";
+
+/* ---- persistence: local to this browser only, no backend ----
+   Saves profile/answers/step so a refresh or closed tab doesn't cost the
+   user their ten minutes. Deliberately best-effort: private browsing or a
+   full storage quota should degrade silently, never break the app. */
+function saveState(){
+  try{
+    localStorage.setItem(SAVE_KEY, JSON.stringify({
+      type:S.type, country:S.country, staff:S.staff, sites:S.sites, rev:S.rev, own:S.own,
+      motives:S.motives, answers:S.answers, unknown:S.unknown, bizName:S.bizName, step
+    }));
+  }catch(e){}
+}
+function loadState(){
+  let raw;
+  try{ raw = localStorage.getItem(SAVE_KEY); }catch(e){ return false; }
+  if(!raw) return false;
+  let d;
+  try{ d = JSON.parse(raw); }catch(e){ try{ localStorage.removeItem(SAVE_KEY); }catch(e2){} return false; }
+  if(!d || !d.step) return false;
+  Object.assign(S, {
+    type:d.type||S.type, country:d.country||S.country, staff:d.staff||S.staff, sites:d.sites||S.sites,
+    rev:d.rev||S.rev, own:d.own||S.own, motives:d.motives||S.motives,
+    answers:d.answers||{}, unknown:d.unknown||{}, bizName:d.bizName||""
+  });
+  return d.step;
+}
+function startOver(){
+  try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
+  location.href = location.pathname;
+}
+
+/* Re-populates step-1 form fields and step state from a restored S,
+   without re-reading (empty) DOM values the way captureProfile() would. */
+function applyProfileToForm(){
+  if($("btype")) $("btype").value = S.type;
+  if($("country")){ $("country").value = S.country; showGrid(); }
+  if($("staff")) $("staff").value = S.staff;
+  if($("sites")) $("sites").value = S.sites;
+  if($("rev")) $("rev").value = S.rev;
+  if($("own")) $("own").value = S.own;
+  document.querySelectorAll('#motives .chip').forEach(c => c.classList.toggle('on', S.motives.includes(c.dataset.m)));
+  if($("bizName") && S.bizName) $("bizName").value = S.bizName;
+}
+function restoreView(n){
+  applyProfileToForm();
+  compute();
+  if(n===2) renderQuestions();
+  if(n>=3) renderFootprint();
+  if(n>=4){ renderPlan(); renderSupport(); }
+  if(n>=5) renderPeers();
+  if(n>=6) renderShare();
+  for(let i=1;i<=6;i++) $("s"+i).classList.toggle("hide", i!==n);
+  step=n; renderSteps();
+}
+
+/* ---- contributed peer cases: also local-only for now (see contribute()) ---- */
+function loadContributedCases(){
+  try{
+    const raw = localStorage.getItem(CASES_KEY);
+    if(!raw) return;
+    const extra = JSON.parse(raw);
+    if(Array.isArray(extra)) CASES.unshift(...extra);
+  }catch(e){}
+}
+function saveContributedCase(entry){
+  try{
+    const raw = localStorage.getItem(CASES_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    arr.unshift(entry);
+    localStorage.setItem(CASES_KEY, JSON.stringify(arr));
+  }catch(e){}
+}
 
 const $ = id => document.getElementById(id);
 const num = v => { const n = parseFloat(v); return isFinite(n) ? n : null; };
@@ -957,19 +1032,6 @@ function hotspotColor(name){
 }
 
 /* ---- init ---- */
-(function init(){
-  $("btype").innerHTML = Object.entries(TYPES)
-    .map(([k,v]) => `<option value="${k}">${v.icon}  ${v.name}</option>`).join("");
-  $("country").innerHTML = Object.keys(GRIDS).sort()
-    .map(c => `<option value="${c}"${c==="Italy"?" selected":""}>${c}</option>`).join("");
-  $("motives").innerHTML = MOTIVES.map(m =>
-    `<button class="chip${S.motives.includes(m.id)?" on":""}" data-m="${m.id}" onclick="toggleMotive('${m.id}',this)">${m.label}<small>${m.sub}</small></button>`).join("");
-  $("country").onchange = showGrid;
-  showGrid();
-  renderSteps();
-  maybeRenderPublicBadge();
-})();
-
 function showGrid(){
   const c = $("country").value, f = GRIDS[c];
   const band = gridBand(f);
@@ -983,6 +1045,7 @@ function toggleMotive(id, el){
   const i = S.motives.indexOf(id);
   if(i>-1){ if(S.motives.length===1) return; S.motives.splice(i,1); el.classList.remove("on"); }
   else { S.motives.push(id); el.classList.add("on"); }
+  saveState();
 }
 
 function renderSteps(){
@@ -1003,6 +1066,7 @@ function go(n){
   if(n===2) renderQuestions();
   for(let i=1;i<=6;i++) $("s"+i).classList.toggle("hide", i!==n);
   step=n; renderSteps(); window.scrollTo({top:0,behavior:"smooth"});
+  saveState();
 }
 
 /* One-click demos: pre-filled, realistic businesses across sectors/countries so a
@@ -1027,6 +1091,7 @@ function loadExample(key){
   compute(); renderFootprint();
   for(let i=1;i<=6;i++) $("s"+i).classList.toggle("hide", i!==3);
   step=3; renderSteps(); window.scrollTo({top:0,behavior:"smooth"});
+  saveState();
 }
 
 function captureProfile(){
@@ -1073,6 +1138,10 @@ function renderQuestions(){
     if(q.alt && S.answers[q.alt.id]!=null && $("q_"+q.alt.id)) $("q_"+q.alt.id).value = S.answers[q.alt.id];
     if(S.unknown[q.id] && $("dk_"+q.id)){ const cb=$("dk_"+q.id).querySelector("input"); if(cb){ cb.checked=true; $("dk_"+q.id).classList.add("on"); } }
   });
+
+  // autosave as they type, so a mid-form refresh doesn't cost them the answers
+  $("qlist").oninput = () => { captureAnswers(); saveState(); };
+  $("qlist").onchange = () => { captureAnswers(); saveState(); };
 }
 
 function estimateKwh(){
@@ -1429,7 +1498,7 @@ function badgeHTML(d, pub){
 }
 
 function renderShare(){ $("badge-preview").innerHTML = badgeHTML(badgeData(), false); }
-function updateBadgeName(v){ S.bizName = v; renderShare(); }
+function updateBadgeName(v){ S.bizName = v; renderShare(); saveState(); }
 function shareLink(){
   const url = location.origin + location.pathname + "#badge=" + encodeBadge(badgeData());
   const msg = $("share-msg");
@@ -1459,13 +1528,40 @@ function maybeRenderPublicBadge(){
 function contribute(){
   const w=$("c-what").value.trim(), r=$("c-res").value.trim();
   if(!w||!r){ $("c-msg").textContent="Fill both fields."; $("c-msg").style.color="var(--red)"; return; }
-  CASES.unshift({ biz:"Your business", country:S.country, type:S.type, staff:S.staff,
-    grid:gridBand(GRIDS[S.country]), did:w, res:r, motive:S.motives, seed:[] });
+  const entry = { biz:"Your business", country:S.country, type:S.type, staff:S.staff,
+    grid:gridBand(GRIDS[S.country]), did:w, res:r, motive:S.motives, seed:[] };
+  CASES.unshift(entry);
+  saveContributedCase(entry);
   $("c-msg").style.color="var(--green)";
-  $("c-msg").textContent="Added — you're now a reference case for the next business like yours.";
+  $("c-msg").textContent="Saved on this device — it'll show in your peer list here from now on. (Sharing it with other businesses is coming next, not live yet.)";
   $("c-what").value=""; $("c-res").value="";
   renderPeers();
 }
+
+/* init runs last, after every function/const above it is defined —
+   it calls into renderPlan()/renderPeers() etc. via restoreView() to
+   resume a saved session, so it can't run any earlier in this script. */
+(function init(){
+  $("btype").innerHTML = Object.entries(TYPES)
+    .map(([k,v]) => `<option value="${k}">${v.icon}  ${v.name}</option>`).join("");
+  $("country").innerHTML = Object.keys(GRIDS).sort()
+    .map(c => `<option value="${c}"${c==="Italy"?" selected":""}>${c}</option>`).join("");
+  $("motives").innerHTML = MOTIVES.map(m =>
+    `<button class="chip${S.motives.includes(m.id)?" on":""}" data-m="${m.id}" onclick="toggleMotive('${m.id}',this)">${m.label}<small>${m.sub}</small></button>`).join("");
+  $("btype").onchange = () => { captureProfile(); saveState(); };
+  $("country").onchange = () => { showGrid(); captureProfile(); saveState(); };
+  $("staff").oninput = () => { captureProfile(); saveState(); };
+  $("sites").oninput = () => { captureProfile(); saveState(); };
+  $("rev").onchange = () => { captureProfile(); saveState(); };
+  $("own").onchange = () => { captureProfile(); saveState(); };
+  showGrid();
+  renderSteps();
+  loadContributedCases();
+  if(!maybeRenderPublicBadge()){
+    const savedStep = loadState();
+    if(savedStep) restoreView(savedStep);
+  }
+})();
 </script>
 </body>
 </html>
